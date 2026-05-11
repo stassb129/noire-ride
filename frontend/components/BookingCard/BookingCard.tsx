@@ -3,7 +3,7 @@
 import { useLocale } from 'next-intl';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { apiClient } from '@/lib/api/client';
+import { apiClient, Booking } from '@/lib/api/client';
 import CustomSelect from '@/components/ui/CustomSelect/CustomSelect';
 import styles from './BookingCard.module.scss';
 
@@ -11,7 +11,7 @@ export default function BookingCard() {
   const locale = useLocale();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
-  const [serviceType, setServiceType] = useState('intercity');
+  const [serviceType, setServiceType] = useState<Booking['serviceType']>('intercity');
   const [vehicleType, setVehicleType] = useState('business');
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -22,8 +22,8 @@ export default function BookingCard() {
     const formData = new FormData(e.currentTarget);
     
     try {
-      const booking = {
-        serviceType: formData.get('serviceType') as string,
+      const booking: Partial<Booking> = {
+        serviceType: formData.get('serviceType') as Booking['serviceType'],
         from: formData.get('from') as string,
         to: formData.get('to') as string,
         departureDate: formData.get('date') as string,
@@ -163,7 +163,7 @@ export default function BookingCard() {
           <CustomSelect
             name="serviceType"
             value={serviceType}
-            onChange={setServiceType}
+            onChange={(value) => setServiceType(value as Booking['serviceType'])}
             options={[
               { value: 'intercity', label: locale === 'ru' ? 'Междугород' : 'Intercity' },
               { value: 'airport', label: locale === 'ru' ? 'Аэропорт' : 'Airport' },

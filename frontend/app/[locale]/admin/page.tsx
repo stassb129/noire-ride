@@ -21,7 +21,11 @@ export default function AdminDashboard() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const data = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/admin/statistics`);
+        const response = await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/admin/statistics`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch statistics');
+        }
+        const data: Statistics = await response.json();
         setStats(data);
       } catch (error) {
         console.error('Error fetching statistics:', error);
