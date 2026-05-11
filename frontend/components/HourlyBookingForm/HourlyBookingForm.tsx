@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useLocale } from 'next-intl';
 import { motion } from 'framer-motion';
+import CustomSelect from '@/components/ui/CustomSelect/CustomSelect';
 import styles from '../RouteBookingForm/RouteBookingForm.module.scss';
 
 export default function HourlyBookingForm() {
@@ -68,7 +69,7 @@ export default function HourlyBookingForm() {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -203,21 +204,21 @@ export default function HourlyBookingForm() {
             <label className={styles.label}>
               {locale === 'ru' ? 'Количество часов' : 'Hours'}
             </label>
-            <select
+            <CustomSelect
               name="hours"
-              value={formData.hours}
-              onChange={handleChange}
-              className={styles.select}
+              value={String(formData.hours)}
+              onChange={(value) => setFormData((prev) => ({ ...prev, hours: Number(value) }))}
+              options={[
+                { value: '3', label: locale === 'ru' ? '3 часа' : '3 hours' },
+                { value: '4', label: locale === 'ru' ? '4 часа' : '4 hours' },
+                { value: '5', label: locale === 'ru' ? '5 часов' : '5 hours' },
+                { value: '6', label: locale === 'ru' ? '6 часов' : '6 hours' },
+                { value: '8', label: locale === 'ru' ? '8 часов' : '8 hours' },
+                { value: '10', label: locale === 'ru' ? '10 часов' : '10 hours' },
+                { value: '12', label: locale === 'ru' ? '12 часов' : '12 hours' },
+              ]}
               required
-            >
-              <option value="3">{locale === 'ru' ? '3 часа' : '3 hours'}</option>
-              <option value="4">{locale === 'ru' ? '4 часа' : '4 hours'}</option>
-              <option value="5">{locale === 'ru' ? '5 часов' : '5 hours'}</option>
-              <option value="6">{locale === 'ru' ? '6 часов' : '6 hours'}</option>
-              <option value="8">{locale === 'ru' ? '8 часов' : '8 hours'}</option>
-              <option value="10">{locale === 'ru' ? '10 часов' : '10 hours'}</option>
-              <option value="12">{locale === 'ru' ? '12 часов' : '12 hours'}</option>
-            </select>
+            />
           </div>
 
           <div className={styles.formGroup}>
@@ -241,26 +242,18 @@ export default function HourlyBookingForm() {
           <label className={styles.label}>
             {locale === 'ru' ? 'Класс автомобиля' : 'Vehicle class'}
           </label>
-          <select
+          <CustomSelect
             name="vehicleClass"
             value={formData.vehicleClass}
-            onChange={handleChange}
-            className={styles.select}
+            onChange={(value) => setFormData((prev) => ({ ...prev, vehicleClass: value }))}
+            options={[
+              { value: 'business', label: locale === 'ru' ? 'Бизнес - 1500₽/ч' : 'Business - 1500₽/h' },
+              { value: 'comfort', label: locale === 'ru' ? 'Комфорт - 2000₽/ч' : 'Comfort - 2000₽/h' },
+              { value: 'minivan', label: locale === 'ru' ? 'Минивэн - 2500₽/ч' : 'Minivan - 2500₽/h' },
+              { value: 'luxury', label: locale === 'ru' ? 'Люкс - 3000₽/ч' : 'Luxury - 3000₽/h' },
+            ]}
             required
-          >
-            <option value="business">
-              {locale === 'ru' ? 'Бизнес - 1500₽/ч' : 'Business - 1500₽/h'}
-            </option>
-            <option value="comfort">
-              {locale === 'ru' ? 'Комфорт - 2000₽/ч' : 'Comfort - 2000₽/h'}
-            </option>
-            <option value="minivan">
-              {locale === 'ru' ? 'Минивэн - 2500₽/ч' : 'Minivan - 2500₽/h'}
-            </option>
-            <option value="luxury">
-              {locale === 'ru' ? 'Люкс - 3000₽/ч' : 'Luxury - 3000₽/h'}
-            </option>
-          </select>
+          />
         </div>
 
         <div className={styles.formGroup}>

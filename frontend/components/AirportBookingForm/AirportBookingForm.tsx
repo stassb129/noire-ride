@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useLocale } from 'next-intl';
 import { motion } from 'framer-motion';
+import CustomSelect from '@/components/ui/CustomSelect/CustomSelect';
 import styles from '../RouteBookingForm/RouteBookingForm.module.scss';
 
 export default function AirportBookingForm() {
@@ -74,7 +75,7 @@ export default function AirportBookingForm() {
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -152,33 +153,33 @@ export default function AirportBookingForm() {
             <label className={styles.label}>
               {locale === 'ru' ? 'Тип услуги' : 'Service type'}
             </label>
-            <select
+            <CustomSelect
               name="serviceType"
               value={formData.serviceType}
-              onChange={handleChange}
-              className={styles.select}
+              onChange={(value) => setFormData((prev) => ({ ...prev, serviceType: value }))}
+              options={[
+                { value: 'pickup', label: locale === 'ru' ? 'Встреча из аэропорта' : 'Airport pickup' },
+                { value: 'dropoff', label: locale === 'ru' ? 'Проводы в аэропорт' : 'Airport drop-off' },
+              ]}
               required
-            >
-              <option value="pickup">{locale === 'ru' ? 'Встреча из аэропорта' : 'Airport pickup'}</option>
-              <option value="dropoff">{locale === 'ru' ? 'Проводы в аэропорт' : 'Airport drop-off'}</option>
-            </select>
+            />
           </div>
 
           <div className={styles.formGroup}>
             <label className={styles.label}>
               {locale === 'ru' ? 'Аэропорт' : 'Airport'}
             </label>
-            <select
+            <CustomSelect
               name="airport"
               value={formData.airport}
-              onChange={handleChange}
-              className={styles.select}
+              onChange={(value) => setFormData((prev) => ({ ...prev, airport: value }))}
+              options={[
+                { value: 'SVO', label: 'Шереметьево (SVO)' },
+                { value: 'DME', label: 'Домодедово (DME)' },
+                { value: 'VKO', label: 'Внуково (VKO)' },
+              ]}
               required
-            >
-              <option value="SVO">Шереметьево (SVO)</option>
-              <option value="DME">Домодедово (DME)</option>
-              <option value="VKO">Внуково (VKO)</option>
-            </select>
+            />
           </div>
         </div>
 
@@ -248,26 +249,18 @@ export default function AirportBookingForm() {
             <label className={styles.label}>
               {locale === 'ru' ? 'Класс автомобиля' : 'Vehicle class'}
             </label>
-            <select
+            <CustomSelect
               name="vehicleClass"
               value={formData.vehicleClass}
-              onChange={handleChange}
-              className={styles.select}
+              onChange={(value) => setFormData((prev) => ({ ...prev, vehicleClass: value }))}
+              options={[
+                { value: 'business', label: locale === 'ru' ? 'Бизнес - 6000₽' : 'Business - 6000₽' },
+                { value: 'comfort', label: locale === 'ru' ? 'Комфорт - 8000₽' : 'Comfort - 8000₽' },
+                { value: 'minivan', label: locale === 'ru' ? 'Минивэн - 10000₽' : 'Minivan - 10000₽' },
+                { value: 'luxury', label: locale === 'ru' ? 'Люкс - 12500₽' : 'Luxury - 12500₽' },
+              ]}
               required
-            >
-              <option value="business">
-                {locale === 'ru' ? 'Бизнес - 6000₽' : 'Business - 6000₽'}
-              </option>
-              <option value="comfort">
-                {locale === 'ru' ? 'Комфорт - 8000₽' : 'Comfort - 8000₽'}
-              </option>
-              <option value="minivan">
-                {locale === 'ru' ? 'Минивэн - 10000₽' : 'Minivan - 10000₽'}
-              </option>
-              <option value="luxury">
-                {locale === 'ru' ? 'Люкс - 12500₽' : 'Luxury - 12500₽'}
-              </option>
-            </select>
+            />
           </div>
 
           <div className={styles.formGroup}>

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useLocale } from 'next-intl';
 import { motion } from 'framer-motion';
+import CustomSelect from '@/components/ui/CustomSelect/CustomSelect';
 import styles from './RouteBookingForm.module.scss';
 
 interface RouteBookingFormProps {
@@ -89,7 +90,7 @@ export default function RouteBookingForm({ prefilledData }: RouteBookingFormProp
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -167,32 +168,32 @@ export default function RouteBookingForm({ prefilledData }: RouteBookingFormProp
             <label className={styles.label}>
               {locale === 'ru' ? 'Откуда' : 'From'}
             </label>
-            <select
+            <CustomSelect
               name="from"
               value={formData.from}
-              onChange={handleChange}
-              className={styles.select}
+              onChange={(value) => setFormData((prev) => ({ ...prev, from: value }))}
+              options={[
+                { value: 'Москва', label: 'Москва' },
+                { value: 'Санкт-Петербург', label: 'Санкт-Петербург' },
+              ]}
               required
-            >
-              <option value="Москва">Москва</option>
-              <option value="Санкт-Петербург">Санкт-Петербург</option>
-            </select>
+            />
           </div>
 
           <div className={styles.formGroup}>
             <label className={styles.label}>
               {locale === 'ru' ? 'Куда' : 'To'}
             </label>
-            <select
+            <CustomSelect
               name="to"
               value={formData.to}
-              onChange={handleChange}
-              className={styles.select}
+              onChange={(value) => setFormData((prev) => ({ ...prev, to: value }))}
+              options={[
+                { value: 'Санкт-Петербург', label: 'Санкт-Петербург' },
+                { value: 'Москва', label: 'Москва' },
+              ]}
               required
-            >
-              <option value="Санкт-Петербург">Санкт-Петербург</option>
-              <option value="Москва">Москва</option>
-            </select>
+            />
           </div>
         </div>
 
@@ -233,26 +234,18 @@ export default function RouteBookingForm({ prefilledData }: RouteBookingFormProp
             <label className={styles.label}>
               {locale === 'ru' ? 'Класс автомобиля' : 'Vehicle class'}
             </label>
-            <select
+            <CustomSelect
               name="vehicleClass"
               value={formData.vehicleClass}
-              onChange={handleChange}
-              className={styles.select}
+              onChange={(value) => setFormData((prev) => ({ ...prev, vehicleClass: value }))}
+              options={[
+                { value: 'business', label: locale === 'ru' ? 'Бизнес (80₽/км)' : 'Business (80₽/km)' },
+                { value: 'comfort', label: locale === 'ru' ? 'Комфорт (100₽/км)' : 'Comfort (100₽/km)' },
+                { value: 'minivan', label: locale === 'ru' ? 'Минивэн (120₽/км)' : 'Minivan (120₽/km)' },
+                { value: 'luxury', label: locale === 'ru' ? 'Люкс (150₽/км)' : 'Luxury (150₽/km)' },
+              ]}
               required
-            >
-              <option value="business">
-                {locale === 'ru' ? 'Бизнес (80₽/км)' : 'Business (80₽/km)'}
-              </option>
-              <option value="comfort">
-                {locale === 'ru' ? 'Комфорт (100₽/км)' : 'Comfort (100₽/km)'}
-              </option>
-              <option value="minivan">
-                {locale === 'ru' ? 'Минивэн (120₽/км)' : 'Minivan (120₽/km)'}
-              </option>
-              <option value="luxury">
-                {locale === 'ru' ? 'Люкс (150₽/км)' : 'Luxury (150₽/km)'}
-              </option>
-            </select>
+            />
           </div>
 
           <div className={styles.formGroup}>

@@ -85,7 +85,8 @@
 .tableContainer {
   background: $bg-secondary;
   border-radius: $radius-lg;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: visible;
   border: 1px solid $border-subtle;
 }
 

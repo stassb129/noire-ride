@@ -4,12 +4,15 @@ import { useLocale } from 'next-intl';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { apiClient } from '@/lib/api/client';
+import CustomSelect from '@/components/ui/CustomSelect/CustomSelect';
 import styles from './BookingCard.module.scss';
 
 export default function BookingCard() {
   const locale = useLocale();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [serviceType, setServiceType] = useState('intercity');
+  const [vehicleType, setVehicleType] = useState('business');
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -38,6 +41,8 @@ export default function BookingCard() {
       
       alert(locale === 'ru' ? 'Бронирование создано! Мы свяжемся с вами в ближайшее время.' : 'Booking created! We will contact you shortly.');
       e.currentTarget.reset();
+      setServiceType('intercity');
+      setVehicleType('business');
     } catch (err: any) {
       setError(err.message || (locale === 'ru' ? 'Ошибка при создании бронирования' : 'Error creating booking'));
     } finally {
@@ -155,22 +160,34 @@ export default function BookingCard() {
           <label className={styles.label}>
             {locale === 'ru' ? 'Тип услуги' : 'Service type'}
           </label>
-          <select name="serviceType" className={styles.select} required>
-            <option value="intercity">{locale === 'ru' ? 'Междугород' : 'Intercity'}</option>
-            <option value="airport">{locale === 'ru' ? 'Аэропорт' : 'Airport'}</option>
-            <option value="hourly">{locale === 'ru' ? 'Почасовая' : 'Hourly'}</option>
-          </select>
+          <CustomSelect
+            name="serviceType"
+            value={serviceType}
+            onChange={setServiceType}
+            options={[
+              { value: 'intercity', label: locale === 'ru' ? 'Междугород' : 'Intercity' },
+              { value: 'airport', label: locale === 'ru' ? 'Аэропорт' : 'Airport' },
+              { value: 'hourly', label: locale === 'ru' ? 'Почасовая' : 'Hourly' },
+            ]}
+            required
+          />
         </div>
 
         <div className={styles.formGroup}>
           <label className={styles.label}>
             {locale === 'ru' ? 'Класс автомобиля' : 'Car type'}
           </label>
-          <select name="vehicleType" className={styles.select} required>
-            <option value="business">{locale === 'ru' ? 'Бизнес' : 'Business'}</option>
-            <option value="minivan">{locale === 'ru' ? 'Минивэн' : 'Minivan'}</option>
-            <option value="luxury">Luxury</option>
-          </select>
+          <CustomSelect
+            name="vehicleType"
+            value={vehicleType}
+            onChange={setVehicleType}
+            options={[
+              { value: 'business', label: locale === 'ru' ? 'Бизнес' : 'Business' },
+              { value: 'minivan', label: locale === 'ru' ? 'Минивэн' : 'Minivan' },
+              { value: 'luxury', label: 'Luxury' },
+            ]}
+            required
+          />
         </div>
 
         <div className={styles.formGroup}>

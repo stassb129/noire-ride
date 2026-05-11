@@ -1,0 +1,121 @@
+@use '../../../styles/scss/variables' as *;
+@use '../../../styles/scss/mixins' as *;
+
+.selectRoot {
+  position: relative;
+  width: 100%;
+}
+
+.trigger {
+  width: 100%;
+  text-align: left;
+  border: none;
+  cursor: pointer;
+  transition: $transition;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-sm;
+  color: $text-primary;
+  font-size: 16px;
+  background: transparent;
+
+  @include mobile {
+    font-size: 15px;
+  }
+}
+
+.underlined {
+  .trigger {
+    height: 52px;
+    border-bottom: 1px solid $border-subtle;
+    padding: 0 $spacing-xs 8px 0;
+
+    &:focus-visible {
+      outline: none;
+      border-bottom-color: $accent-gold;
+      box-shadow: 0 1px 0 0 $accent-gold, 0 3px 12px rgba($accent-gold, 0.3);
+    }
+  }
+}
+
+.boxed {
+  .trigger {
+    min-height: 38px;
+    border: 1px solid $border-subtle;
+    border-radius: $radius-sm;
+    padding: 8px 10px;
+    background: $bg-primary;
+
+    &:focus-visible {
+      outline: none;
+      border-color: $accent-gold;
+      box-shadow: 0 0 0 2px rgba($accent-gold, 0.15);
+    }
+  }
+}
+
+.value {
+  color: $text-primary;
+}
+
+.placeholder {
+  color: $text-muted;
+}
+
+.chevron {
+  color: $accent-gold;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+.menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: 100%;
+  z-index: 60;
+  border: 1px solid rgba($accent-gold, 0.25);
+  border-radius: $radius-main;
+  background: rgba($bg-secondary, 0.98);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+  padding: 6px;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.option {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  color: $text-secondary;
+  cursor: pointer;
+  border-radius: $radius-sm;
+  padding: 10px 12px;
+  font-size: 14px;
+  transition: $transition;
+
+  &:hover {
+    color: $text-primary;
+    background: rgba($accent-gold, 0.12);
+  }
+}
+
+.optionActive {
+  color: $text-primary;
+  background: rgba($accent-gold, 0.2);
+}
+
+.disabled {
+  opacity: 0.6;
+
+  .trigger {
+    cursor: not-allowed;
+  }
+}

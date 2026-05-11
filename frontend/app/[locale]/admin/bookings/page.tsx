@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { fetchWithAuth } from '@/lib/utils/fetchWithAuth';
+import CustomSelect from '@/components/ui/CustomSelect/CustomSelect';
 import styles from './bookings.module.scss';
 
 type BookingType = 'contacts' | 'routes' | 'airport' | 'hourly';
@@ -378,15 +379,25 @@ export default function AllBookingsPage() {
 
               {bookingType === 'airport' && (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, minmax(0, 1fr))', gap: '8px', marginBottom: '8px' }}>
-                  <select value={createData.serviceType || 'pickup'} onChange={(e) => setCreateData({ ...createData, serviceType: e.target.value })} className={styles.statusSelect}>
-                    <option value="pickup">Встреча</option>
-                    <option value="dropoff">Проводы</option>
-                  </select>
-                  <select value={createData.airport || 'SVO'} onChange={(e) => setCreateData({ ...createData, airport: e.target.value })} className={styles.statusSelect}>
-                    <option value="SVO">SVO</option>
-                    <option value="DME">DME</option>
-                    <option value="VKO">VKO</option>
-                  </select>
+                  <CustomSelect
+                    value={createData.serviceType || 'pickup'}
+                    onChange={(value) => setCreateData({ ...createData, serviceType: value })}
+                    options={[
+                      { value: 'pickup', label: 'Встреча' },
+                      { value: 'dropoff', label: 'Проводы' },
+                    ]}
+                    variant="boxed"
+                  />
+                  <CustomSelect
+                    value={createData.airport || 'SVO'}
+                    onChange={(value) => setCreateData({ ...createData, airport: value })}
+                    options={[
+                      { value: 'SVO', label: 'SVO' },
+                      { value: 'DME', label: 'DME' },
+                      { value: 'VKO', label: 'VKO' },
+                    ]}
+                    variant="boxed"
+                  />
                   <input placeholder="Адрес" value={createData.address || ''} onChange={(e) => setCreateData({ ...createData, address: e.target.value })} className={styles.statusSelect} />
                   <input type="date" value={createData.date || ''} onChange={(e) => setCreateData({ ...createData, date: e.target.value })} className={styles.statusSelect} />
                   <input type="time" value={createData.time || ''} onChange={(e) => setCreateData({ ...createData, time: e.target.value })} className={styles.statusSelect} />
@@ -406,12 +417,17 @@ export default function AllBookingsPage() {
 
               {bookingType !== 'contacts' && (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '8px' }}>
-                  <select value={createData.vehicleClass || 'business'} onChange={(e) => setCreateData({ ...createData, vehicleClass: e.target.value })} className={styles.statusSelect}>
-                    <option value="business">Business</option>
-                    <option value="premium">Premium</option>
-                    <option value="minivan">Minivan</option>
-                    <option value="luxury">Luxury</option>
-                  </select>
+                  <CustomSelect
+                    value={createData.vehicleClass || 'business'}
+                    onChange={(value) => setCreateData({ ...createData, vehicleClass: value })}
+                    options={[
+                      { value: 'business', label: 'Business' },
+                      { value: 'premium', label: 'Premium' },
+                      { value: 'minivan', label: 'Minivan' },
+                      { value: 'luxury', label: 'Luxury' },
+                    ]}
+                    variant="boxed"
+                  />
                   {bookingType === 'airport' && (
                     <input type="number" min={0} placeholder="Багаж" value={createData.luggage || 1} onChange={(e) => setCreateData({ ...createData, luggage: Number(e.target.value) })} className={styles.statusSelect} />
                   )}
@@ -502,17 +518,21 @@ export default function AllBookingsPage() {
                   
                   <td>
                     {editingId === booking.id ? (
-                      <select
+                      <CustomSelect
                         value={editStatus}
-                        onChange={(e) => setEditStatus(e.target.value)}
-                        className={styles.statusSelect}
-                      >
-                        <option value="pending">Новая</option>
-                        {bookingType !== 'contacts' && <option value="confirmed">Подтверждена</option>}
-                        {bookingType !== 'contacts' && <option value="completed">Завершена</option>}
-                        {bookingType !== 'contacts' && <option value="cancelled">Отменена</option>}
-                        {bookingType === 'contacts' && <option value="contacted">Связались</option>}
-                      </select>
+                        onChange={setEditStatus}
+                        options={[
+                          { value: 'pending', label: 'Новая' },
+                          ...(bookingType !== 'contacts'
+                            ? [
+                                { value: 'confirmed', label: 'Подтверждена' },
+                                { value: 'completed', label: 'Завершена' },
+                                { value: 'cancelled', label: 'Отменена' },
+                              ]
+                            : [{ value: 'contacted', label: 'Связались' }]),
+                        ]}
+                        variant="boxed"
+                      />
                     ) : (
                       <span className={`${styles.statusBadge} ${styles[booking.status]}`}>
                         {booking.status}

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { fetchWithAuth } from '@/lib/utils/fetchWithAuth';
+import CustomSelect from '@/components/ui/CustomSelect/CustomSelect';
 import styles from '../bookings/bookings.module.scss';
 
 interface HourlyPricing {
@@ -357,25 +358,27 @@ export default function AdminPricingPage() {
                     />
                   </td>
                   <td>
-                    <select
+                    <CustomSelect
                       value={createData.airportCode || 'SVO'}
-                      onChange={(e) => setCreateData({ ...createData, airportCode: e.target.value })}
-                      style={{ padding: '6px', background: '#0A0A0A', border: '1px solid #2A2A2A', borderRadius: '4px', color: '#eaeaea' }}
-                    >
-                      <option value="SVO">SVO</option>
-                      <option value="DME">DME</option>
-                      <option value="VKO">VKO</option>
-                    </select>
+                      onChange={(value) => setCreateData({ ...createData, airportCode: value })}
+                      options={[
+                        { value: 'SVO', label: 'SVO' },
+                        { value: 'DME', label: 'DME' },
+                        { value: 'VKO', label: 'VKO' },
+                      ]}
+                      variant="boxed"
+                    />
                   </td>
                   <td>
-                    <select
+                    <CustomSelect
                       value={createData.direction || 'to_airport'}
-                      onChange={(e) => setCreateData({ ...createData, direction: e.target.value })}
-                      style={{ padding: '6px', background: '#0A0A0A', border: '1px solid #2A2A2A', borderRadius: '4px', color: '#eaeaea' }}
-                    >
-                      <option value="to_airport">В аэропорт</option>
-                      <option value="from_airport">Из аэропорта</option>
-                    </select>
+                      onChange={(value) => setCreateData({ ...createData, direction: value })}
+                      options={[
+                        { value: 'to_airport', label: 'В аэропорт' },
+                        { value: 'from_airport', label: 'Из аэропорта' },
+                      ]}
+                      variant="boxed"
+                    />
                   </td>
                   <td>
                     <input
@@ -406,25 +409,27 @@ export default function AdminPricingPage() {
                         />
                       </td>
                       <td>
-                        <select
-                          value={editData.airportCode || ''}
-                          onChange={(e) => setEditData({ ...editData, airportCode: e.target.value })}
-                          style={{ padding: '6px', background: '#0A0A0A', border: '1px solid #2A2A2A', borderRadius: '4px', color: '#eaeaea' }}
-                        >
-                          <option value="SVO">SVO</option>
-                          <option value="DME">DME</option>
-                          <option value="VKO">VKO</option>
-                        </select>
+                        <CustomSelect
+                          value={editData.airportCode || 'SVO'}
+                          onChange={(value) => setEditData({ ...editData, airportCode: value })}
+                          options={[
+                            { value: 'SVO', label: 'SVO' },
+                            { value: 'DME', label: 'DME' },
+                            { value: 'VKO', label: 'VKO' },
+                          ]}
+                          variant="boxed"
+                        />
                       </td>
                       <td>
-                        <select
-                          value={editData.direction || ''}
-                          onChange={(e) => setEditData({ ...editData, direction: e.target.value })}
-                          style={{ padding: '6px', background: '#0A0A0A', border: '1px solid #2A2A2A', borderRadius: '4px', color: '#eaeaea' }}
-                        >
-                          <option value="to_airport">В аэропорт</option>
-                          <option value="from_airport">Из аэропорта</option>
-                        </select>
+                        <CustomSelect
+                          value={editData.direction || 'to_airport'}
+                          onChange={(value) => setEditData({ ...editData, direction: value })}
+                          options={[
+                            { value: 'to_airport', label: 'В аэропорт' },
+                            { value: 'from_airport', label: 'Из аэропорта' },
+                          ]}
+                          variant="boxed"
+                        />
                       </td>
                       <td>
                         <input

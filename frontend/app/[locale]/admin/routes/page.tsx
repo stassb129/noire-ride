@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { fetchWithAuth } from '@/lib/utils/fetchWithAuth';
+import CustomSelect from '@/components/ui/CustomSelect/CustomSelect';
 import styles from '../bookings/bookings.module.scss';
 
 interface Route {
@@ -183,14 +184,15 @@ export default function AdminRoutesPage() {
             </div>
             <div>
               <label style={{ display: 'block', marginBottom: '8px', fontSize: '13px', color: '#9ca3af' }}>Статус</label>
-              <select
+              <CustomSelect
                 value={newRoute.isActive ? 'true' : 'false'}
-                onChange={(e) => setNewRoute({ ...newRoute, isActive: e.target.value === 'true' })}
-                style={{ width: '100%', padding: '8px 12px', background: '#0A0A0A', border: '1px solid #2A2A2A', borderRadius: '6px', color: '#eaeaea' }}
-              >
-                <option value="true">Активен</option>
-                <option value="false">Неактивен</option>
-              </select>
+                onChange={(value) => setNewRoute({ ...newRoute, isActive: value === 'true' })}
+                options={[
+                  { value: 'true', label: 'Активен' },
+                  { value: 'false', label: 'Неактивен' },
+                ]}
+                variant="boxed"
+              />
             </div>
           </div>
           <button
@@ -261,14 +263,15 @@ export default function AdminRoutesPage() {
                       />
                     </td>
                     <td>
-                      <select
+                      <CustomSelect
                         value={editData.isActive ? 'true' : 'false'}
-                        onChange={(e) => setEditData({ ...editData, isActive: e.target.value === 'true' })}
-                        style={{ padding: '6px', background: '#0A0A0A', border: '1px solid #2A2A2A', borderRadius: '4px', color: '#eaeaea' }}
-                      >
-                        <option value="true">Активен</option>
-                        <option value="false">Неактивен</option>
-                      </select>
+                        onChange={(value) => setEditData({ ...editData, isActive: value === 'true' })}
+                        options={[
+                          { value: 'true', label: 'Активен' },
+                          { value: 'false', label: 'Неактивен' },
+                        ]}
+                        variant="boxed"
+                      />
                     </td>
                     <td>
                       <div className={styles.actions}>
