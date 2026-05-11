@@ -4,6 +4,8 @@ import { Repository } from 'typeorm';
 import { Booking, ServiceType, BookingStatus } from '../entities/booking.entity';
 import { Route } from '../entities/route.entity';
 import { CreateBookingDto } from './dto/create-booking.dto';
+import { RouteBooking, AirportBooking, HourlyBooking } from '../entities/specialized-bookings.entity';
+import { CreateRouteBookingDto, CreateAirportBookingDto, CreateHourlyBookingDto } from '../dto/specialized-bookings.dto';
 
 @Injectable()
 export class BookingService {
@@ -13,6 +15,15 @@ export class BookingService {
     
     @InjectRepository(Route)
     private routeRepo: Repository<Route>,
+
+    @InjectRepository(RouteBooking)
+    private routeBookingRepo: Repository<RouteBooking>,
+
+    @InjectRepository(AirportBooking)
+    private airportBookingRepo: Repository<AirportBooking>,
+
+    @InjectRepository(HourlyBooking)
+    private hourlyBookingRepo: Repository<HourlyBooking>,
   ) {}
 
   async createBooking(dto: CreateBookingDto) {
@@ -159,5 +170,65 @@ export class BookingService {
         await this.routeRepo.save(this.routeRepo.create(route));
       }
     }
+  }
+
+  // Specialized booking methods
+  async createRouteBooking(dto: CreateRouteBookingDto) {
+    const booking = this.routeBookingRepo.create(dto);
+    return await this.routeBookingRepo.save(booking);
+  }
+
+  async createAirportBooking(dto: CreateAirportBookingDto) {
+    const booking = this.airportBookingRepo.create(dto);
+    return await this.airportBookingRepo.save(booking);
+  }
+
+  async createHourlyBooking(dto: CreateHourlyBookingDto) {
+    const booking = this.hourlyBookingRepo.create(dto);
+    return await this.hourlyBookingRepo.save(booking);
+  }
+
+  async getAllRouteBookings() {
+    return await this.routeBookingRepo.find({ order: { createdAt: 'DESC' } });
+  }
+
+  async getAllAirportBookings() {
+    return await this.airportBookingRepo.find({ order: { createdAt: 'DESC' } });
+  }
+
+  async getAllHourlyBookings() {
+    return await this.hourlyBookingRepo.find({ order: { createdAt: 'DESC' } });
+  }
+
+  // Update methods
+  async updateRouteBooking(id: number, updateData: Partial<RouteBooking>) {
+    await this.routeBookingRepo.update(id, updateData);
+    return await this.routeBookingRepo.findOne({ where: { id } });
+  }
+
+  async updateAirportBooking(id: number, updateData: Partial<AirportBooking>) {
+    await this.airportBookingRepo.update(id, updateData);
+    return await this.airportBookingRepo.findOne({ where: { id } });
+  }
+
+  async updateHourlyBooking(id: number, updateData: Partial<HourlyBooking>) {
+    await this.hourlyBookingRepo.update(id, updateData);
+    return await this.hourlyBookingRepo.findOne({ where: { id } });
+  }
+
+  // Delete methods
+  async deleteRouteBooking(id: number) {
+    await this.routeBookingRepo.delete(id);
+    return { message: 'Deleted successfully' };
+  }
+
+  async deleteAirportBooking(id: number) {
+    await this.airportBookingRepo.delete(id);
+    return { message: 'Deleted successfully' };
+  }
+
+  async deleteHourlyBooking(id: number) {
+    await this.hourlyBookingRepo.delete(id);
+    return { message: 'Deleted successfully' };
   }
 }

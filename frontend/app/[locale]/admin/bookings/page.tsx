@@ -1,45 +1,85 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useLocale } from 'next-intl';
-import { fetchWithAuth } from '@/lib/auth/api';
+import { fetchWithAuth } from '@/lib/utils/fetchWithAuth';
 import styles from './bookings.module.scss';
 
-interface Booking {
-  id: string;
-  serviceType: string;
-  from: string;
-  to: string;
-  departureDate: string;
-  departureTime?: string;
-  vehicleType: string;
-  passengers: number;
-  price: number;
+type BookingType = 'contacts' | 'routes' | 'airport' | 'hourly';
+type StatusFilter = 'all' | 'pending' | 'confirmed' | 'completed' | 'cancelled';
+
+interface BaseBooking {
+  id: number;
+  name: string;
+  phone: string;
+  email?: string;
   status: string;
-  customerName: string;
-  customerEmail: string;
-  customerPhone: string;
-  notes?: string;
   createdAt: string;
+  notes?: string;
 }
 
-export default function AdminBookingsPage() {
-  const locale = useLocale();
-  const [bookings, setBookings] = useState<Booking[]>([]);
+interface Contact extends BaseBooking {
+  source: string;
+}
+
+interface RouteBooking extends BaseBooking {
+  from: string;
+  to: string;
+  date: string;
+  time: string;
+  vehicleClass: string;
+  passengers: number;
+}
+
+interface AirportBooking extends BaseBooking {
+  serviceType: string;
+  airport: string;
+  address: string;
+  date: string;
+  time: string;
+  flightNumber?: string;
+  vehicleClass: string;
+  passengers: number;
+  luggage: number;
+}
+
+interface HourlyBooking extends BaseBooking {
+  pickupAddress: string;
+  date: string;
+  time: string;
+  hours: number;
+  vehicleClass: string;
+  passengers: number;
+}
+
+type AnyBooking = Contact | RouteBooking | AirportBooking | HourlyBooking;
+
+export default function AllBookingsPage() {
+  const [bookingType, setBookingType] = useState<BookingType>('contacts');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const [bookings, setBookings] = useState<AnyBooking[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editStatus, setEditStatus] = useState('');
 
   useEffect(() => {
     fetchBookings();
-  }, [filterStatus]);
+  }, [bookingType]);
 
   const fetchBookings = async () => {
+    setLoading(true);
     try {
-      const url = filterStatus === 'all'
-        ? `${process.env.NEXT_PUBLIC_API_URL}/admin/bookings`
-        : `${process.env.NEXT_PUBLIC_API_URL}/admin/bookings?status=${filterStatus}`;
-      
-      const data = await fetchWithAuth(url);
+      const endpoints: Record<BookingType, string> = {
+        contacts: '/contacts',
+        routes: '/bookings/route',
+        airport: '/bookings/airport',
+        hourly: '/bookings/hourly'
+      };
+
+      const response = await fetchWithAuth(
+        `${process.env.NEXT_PUBLIC_API_URL}${endpoints[bookingType]}`
+      );
+      if (!response.ok) throw new Error('Failed to fetch');
+      const data = await response.json();
       setBookings(data);
     } catch (error) {
       console.error('Error fetching bookings:', error);
@@ -48,188 +88,293 @@ export default function AdminBookingsPage() {
     }
   };
 
-  const updateStatus = async (id: string, newStatus: string) => {
+  const updateStatus = async (id: number, status: string) => {
     try {
-      await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/admin/bookings/${id}`, {
-        method: 'PATCH',
-        body: JSON.stringify({ status: newStatus }),
-      });
+      const endpoints: Record<BookingType, string> = {
+        contacts: `/contacts/${id}`,
+        routes: `/bookings/route/${id}`,
+        airport: `/bookings/airport/${id}`,
+        hourly: `/bookings/hourly/${id}`
+      };
+
+      const response = await fetchWithAuth(
+        `${process.env.NEXT_PUBLIC_API_URL}${endpoints[bookingType]}`,
+        {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status }),
+        }
+      );
+      if (!response.ok) throw new Error('Failed to update');
       fetchBookings();
+      setEditingId(null);
     } catch (error) {
-      console.error('Error updating booking:', error);
-      alert(locale === 'ru' ? 'Ошибка обновления' : 'Error updating booking');
+      console.error('Error updating status:', error);
     }
   };
 
-  const deleteBooking = async (id: string) => {
-    if (!confirm(locale === 'ru' ? 'Удалить бронирование?' : 'Delete booking?')) {
-      return;
-    }
+  const deleteBooking = async (id: number) => {
+    if (!confirm('Удалить эту заявку?')) return;
 
     try {
-      await fetchWithAuth(`${process.env.NEXT_PUBLIC_API_URL}/admin/bookings/${id}`, {
-        method: 'DELETE',
-      });
+      const endpoints: Record<BookingType, string> = {
+        contacts: `/contacts/${id}`,
+        routes: `/bookings/route/${id}`,
+        airport: `/bookings/airport/${id}`,
+        hourly: `/bookings/hourly/${id}`
+      };
+
+      const response = await fetchWithAuth(
+        `${process.env.NEXT_PUBLIC_API_URL}${endpoints[bookingType]}`,
+        { method: 'DELETE' }
+      );
+      if (!response.ok) throw new Error('Failed to delete');
       fetchBookings();
     } catch (error) {
       console.error('Error deleting booking:', error);
-      alert(locale === 'ru' ? 'Ошибка удаления' : 'Error deleting booking');
     }
   };
 
-  const getStatusBadgeClass = (status: string) => {
-    switch (status) {
-      case 'confirmed': return styles.statusConfirmed;
-      case 'pending': return styles.statusPending;
-      case 'cancelled': return styles.statusCancelled;
-      case 'completed': return styles.statusCompleted;
-      default: return styles.statusPending;
-    }
-  };
+  const filteredBookings = statusFilter === 'all'
+    ? bookings
+    : bookings.filter(b => b.status === statusFilter);
 
-  const getStatusText = (status: string) => {
-    const map: any = {
-      pending: { ru: 'В обработке', en: 'Pending' },
-      confirmed: { ru: 'Подтверждено', en: 'Confirmed' },
-      cancelled: { ru: 'Отменено', en: 'Cancelled' },
-      completed: { ru: 'Завершено', en: 'Completed' },
+  const getTypeLabel = (type: BookingType) => {
+    const labels = {
+      contacts: 'Заявки',
+      routes: 'Маршруты',
+      airport: 'Аэропорт',
+      hourly: 'Почасовая'
     };
-    return locale === 'ru' ? map[status]?.ru : map[status]?.en;
+    return labels[type];
   };
 
-  if (loading) {
-    return (
-      <div className={styles.loading}>
-        {locale === 'ru' ? 'Загрузка...' : 'Loading...'}
-      </div>
-    );
-  }
+  const getStatusCounts = () => {
+    const counts = {
+      all: bookings.length,
+      pending: bookings.filter(b => b.status === 'pending').length,
+      confirmed: bookings.filter(b => b.status === 'confirmed').length,
+      completed: bookings.filter(b => b.status === 'completed').length,
+      cancelled: bookings.filter(b => b.status === 'cancelled').length,
+    };
+    return counts;
+  };
+
+  const counts = getStatusCounts();
 
   return (
-    <div className={styles.bookingsPage}>
+    <div className={styles.page}>
       <div className={styles.header}>
-        <h1 className={styles.title}>
-          {locale === 'ru' ? 'Управление бронированиями' : 'Manage Bookings'}
-        </h1>
+        <h1>Все заявки</h1>
         
-        <div className={styles.filters}>
-          <select 
-            value={filterStatus} 
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className={styles.filterSelect}
+        <div className={styles.typeFilters}>
+          <button
+            className={bookingType === 'contacts' ? styles.active : ''}
+            onClick={() => setBookingType('contacts')}
           >
-            <option value="all">{locale === 'ru' ? 'Все' : 'All'}</option>
-            <option value="pending">{locale === 'ru' ? 'В обработке' : 'Pending'}</option>
-            <option value="confirmed">{locale === 'ru' ? 'Подтверждено' : 'Confirmed'}</option>
-            <option value="completed">{locale === 'ru' ? 'Завершено' : 'Completed'}</option>
-            <option value="cancelled">{locale === 'ru' ? 'Отменено' : 'Cancelled'}</option>
-          </select>
+            📞 Заявки
+          </button>
+          <button
+            className={bookingType === 'routes' ? styles.active : ''}
+            onClick={() => setBookingType('routes')}
+          >
+            🛣️ Маршруты
+          </button>
+          <button
+            className={bookingType === 'airport' ? styles.active : ''}
+            onClick={() => setBookingType('airport')}
+          >
+            ✈️ Аэропорт
+          </button>
+          <button
+            className={bookingType === 'hourly' ? styles.active : ''}
+            onClick={() => setBookingType('hourly')}
+          >
+            ⏱️ Почасовая
+          </button>
+        </div>
+
+        <div className={styles.statusFilters}>
+          <button
+            className={statusFilter === 'all' ? styles.active : ''}
+            onClick={() => setStatusFilter('all')}
+          >
+            Все ({counts.all})
+          </button>
+          <button
+            className={statusFilter === 'pending' ? styles.active : ''}
+            onClick={() => setStatusFilter('pending')}
+          >
+            Новые ({counts.pending})
+          </button>
+          <button
+            className={statusFilter === 'confirmed' ? styles.active : ''}
+            onClick={() => setStatusFilter('confirmed')}
+          >
+            Подтверждённые ({counts.confirmed})
+          </button>
+          <button
+            className={statusFilter === 'completed' ? styles.active : ''}
+            onClick={() => setStatusFilter('completed')}
+          >
+            Завершённые ({counts.completed})
+          </button>
+          {bookingType !== 'contacts' && (
+            <button
+              className={statusFilter === 'cancelled' ? styles.active : ''}
+              onClick={() => setStatusFilter('cancelled')}
+            >
+              Отменённые ({counts.cancelled})
+            </button>
+          )}
         </div>
       </div>
 
-      {bookings.length === 0 ? (
-        <div className={styles.empty}>
-          {locale === 'ru' ? 'Бронирований не найдено' : 'No bookings found'}
-        </div>
+      {loading ? (
+        <p className={styles.loading}>Загрузка...</p>
       ) : (
-        <div className={styles.bookingsList}>
-          {bookings.map((booking) => (
-            <div key={booking.id} className={styles.bookingCard}>
-              <div className={styles.bookingHeader}>
-                <div className={styles.bookingRoute}>
-                  <span className={styles.from}>{booking.from}</span>
-                  <span className={styles.arrow}>→</span>
-                  <span className={styles.to}>{booking.to}</span>
-                </div>
-                <div className={`${styles.statusBadge} ${getStatusBadgeClass(booking.status)}`}>
-                  {getStatusText(booking.status)}
-                </div>
-              </div>
+        <div className={styles.tableContainer}>
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Клиент</th>
+                {bookingType === 'contacts' && <th>Источник</th>}
+                {bookingType === 'routes' && <th>Маршрут</th>}
+                {bookingType === 'routes' && <th>Дата/Время</th>}
+                {bookingType === 'routes' && <th>Класс</th>}
+                {bookingType === 'routes' && <th>Пасс.</th>}
+                {bookingType === 'airport' && <th>Тип/Аэропорт</th>}
+                {bookingType === 'airport' && <th>Адрес</th>}
+                {bookingType === 'airport' && <th>Дата/Время</th>}
+                {bookingType === 'airport' && <th>Рейс</th>}
+                {bookingType === 'hourly' && <th>Адрес подачи</th>}
+                {bookingType === 'hourly' && <th>Дата/Время</th>}
+                {bookingType === 'hourly' && <th>Часов</th>}
+                <th>Статус</th>
+                <th>Создано</th>
+                <th>Действия</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredBookings.map((booking) => (
+                <tr key={booking.id}>
+                  <td>{booking.id}</td>
+                  <td>
+                    <div className={styles.clientInfo}>
+                      <div className={styles.clientName}>{booking.name}</div>
+                      <div className={styles.clientContact}>{booking.phone}</div>
+                      {booking.email && <div className={styles.clientContact}>{booking.email}</div>}
+                    </div>
+                  </td>
+                  
+                  {bookingType === 'contacts' && (
+                    <td>{(booking as Contact).source}</td>
+                  )}
+                  
+                  {bookingType === 'routes' && (
+                    <>
+                      <td>
+                        <strong>{(booking as RouteBooking).from}</strong> → <strong>{(booking as RouteBooking).to}</strong>
+                      </td>
+                      <td>
+                        {(booking as RouteBooking).date}<br />{(booking as RouteBooking).time}
+                      </td>
+                      <td>{(booking as RouteBooking).vehicleClass}</td>
+                      <td>{(booking as RouteBooking).passengers}</td>
+                    </>
+                  )}
+                  
+                  {bookingType === 'airport' && (
+                    <>
+                      <td>
+                        <div>{(booking as AirportBooking).serviceType === 'pickup' ? 'Встреча' : 'Проводы'}</div>
+                        <strong>{(booking as AirportBooking).airport}</strong>
+                      </td>
+                      <td>{(booking as AirportBooking).address}</td>
+                      <td>
+                        {(booking as AirportBooking).date}<br />{(booking as AirportBooking).time}
+                      </td>
+                      <td>{(booking as AirportBooking).flightNumber || '—'}</td>
+                    </>
+                  )}
+                  
+                  {bookingType === 'hourly' && (
+                    <>
+                      <td>{(booking as HourlyBooking).pickupAddress}</td>
+                      <td>
+                        {(booking as HourlyBooking).date}<br />{(booking as HourlyBooking).time}
+                      </td>
+                      <td><strong>{(booking as HourlyBooking).hours}ч</strong></td>
+                    </>
+                  )}
+                  
+                  <td>
+                    {editingId === booking.id ? (
+                      <select
+                        value={editStatus}
+                        onChange={(e) => setEditStatus(e.target.value)}
+                        className={styles.statusSelect}
+                      >
+                        <option value="pending">Новая</option>
+                        {bookingType !== 'contacts' && <option value="confirmed">Подтверждена</option>}
+                        {bookingType !== 'contacts' && <option value="completed">Завершена</option>}
+                        {bookingType !== 'contacts' && <option value="cancelled">Отменена</option>}
+                        {bookingType === 'contacts' && <option value="contacted">Связались</option>}
+                      </select>
+                    ) : (
+                      <span className={`${styles.statusBadge} ${styles[booking.status]}`}>
+                        {booking.status}
+                      </span>
+                    )}
+                  </td>
+                  <td>{new Date(booking.createdAt).toLocaleDateString()}</td>
+                  <td>
+                    <div className={styles.actions}>
+                      {editingId === booking.id ? (
+                        <>
+                          <button
+                            className={styles.saveBtn}
+                            onClick={() => updateStatus(booking.id, editStatus)}
+                          >
+                            ✓
+                          </button>
+                          <button
+                            className={styles.cancelBtn}
+                            onClick={() => setEditingId(null)}
+                          >
+                            ✕
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button
+                            className={styles.editBtn}
+                            onClick={() => {
+                              setEditingId(booking.id);
+                              setEditStatus(booking.status);
+                            }}
+                          >
+                            Изменить
+                          </button>
+                          <button
+                            className={styles.deleteBtn}
+                            onClick={() => deleteBooking(booking.id)}
+                          >
+                            Удалить
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
 
-              <div className={styles.bookingDetails}>
-                <div className={styles.detailRow}>
-                  <span className={styles.detailLabel}>
-                    {locale === 'ru' ? 'Дата' : 'Date'}:
-                  </span>
-                  <span className={styles.detailValue}>
-                    {new Date(booking.departureDate).toLocaleDateString(locale === 'ru' ? 'ru-RU' : 'en-US')}
-                    {booking.departureTime && ` ${booking.departureTime}`}
-                  </span>
-                </div>
-
-                <div className={styles.detailRow}>
-                  <span className={styles.detailLabel}>
-                    {locale === 'ru' ? 'Клиент' : 'Customer'}:
-                  </span>
-                  <span className={styles.detailValue}>
-                    {booking.customerName}
-                  </span>
-                </div>
-
-                <div className={styles.detailRow}>
-                  <span className={styles.detailLabel}>Email:</span>
-                  <span className={styles.detailValue}>{booking.customerEmail}</span>
-                </div>
-
-                <div className={styles.detailRow}>
-                  <span className={styles.detailLabel}>
-                    {locale === 'ru' ? 'Телефон' : 'Phone'}:
-                  </span>
-                  <span className={styles.detailValue}>{booking.customerPhone}</span>
-                </div>
-
-                <div className={styles.detailRow}>
-                  <span className={styles.detailLabel}>
-                    {locale === 'ru' ? 'Автомобиль' : 'Vehicle'}:
-                  </span>
-                  <span className={styles.detailValue}>{booking.vehicleType}</span>
-                </div>
-
-                <div className={styles.detailRow}>
-                  <span className={styles.detailLabel}>
-                    {locale === 'ru' ? 'Пассажиры' : 'Passengers'}:
-                  </span>
-                  <span className={styles.detailValue}>{booking.passengers}</span>
-                </div>
-
-                <div className={styles.detailRow}>
-                  <span className={styles.detailLabel}>
-                    {locale === 'ru' ? 'Цена' : 'Price'}:
-                  </span>
-                  <span className={styles.price}>{booking.price.toLocaleString()}₽</span>
-                </div>
-
-                {booking.notes && (
-                  <div className={styles.notes}>
-                    <span className={styles.detailLabel}>
-                      {locale === 'ru' ? 'Примечания' : 'Notes'}:
-                    </span>
-                    <p>{booking.notes}</p>
-                  </div>
-                )}
-              </div>
-
-              <div className={styles.bookingActions}>
-                <select
-                  value={booking.status}
-                  onChange={(e) => updateStatus(booking.id, e.target.value)}
-                  className={styles.statusSelect}
-                >
-                  <option value="pending">{locale === 'ru' ? 'В обработке' : 'Pending'}</option>
-                  <option value="confirmed">{locale === 'ru' ? 'Подтверждено' : 'Confirmed'}</option>
-                  <option value="completed">{locale === 'ru' ? 'Завершено' : 'Completed'}</option>
-                  <option value="cancelled">{locale === 'ru' ? 'Отменено' : 'Cancelled'}</option>
-                </select>
-
-                <button
-                  onClick={() => deleteBooking(booking.id)}
-                  className={styles.deleteButton}
-                >
-                  {locale === 'ru' ? 'Удалить' : 'Delete'}
-                </button>
-              </div>
-            </div>
-          ))}
+          {filteredBookings.length === 0 && (
+            <p className={styles.noData}>Нет заявок</p>
+          )}
         </div>
       )}
     </div>

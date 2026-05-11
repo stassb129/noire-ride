@@ -69,10 +69,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             📊 Дашборд
           </a>
           <a href="/admin/bookings" className={styles.navLink}>
-            📋 Бронирования
+            📋 Все заявки
           </a>
           <a href="/admin/routes" className={styles.navLink}>
-            🚗 Маршруты
+            🚗 Настройка маршрутов
           </a>
           <a href="/admin/pricing" className={styles.navLink}>
             💰 Цены

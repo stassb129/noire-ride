@@ -14,12 +14,221 @@
 }
 
 .heading {
-  font-family: $font-display;
+  font-family: $font-family-display;
   font-size: clamp(48px, 6vw, 64px);
   font-weight: 800;
-  margin-bottom: $spacing-2xl;
+  margin-bottom: $spacing-lg;
   color: $text-primary;
   letter-spacing: -0.03em;
+  text-align: center;
+}
+
+.description {
+  font-size: 18px;
+  color: $text-secondary;
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto $spacing-2xl;
+  line-height: 1.6;
+}
+
+.pricingSection {
+  margin-top: $spacing-3xl;
+  padding-top: $spacing-3xl;
+  border-top: 1px solid $border-subtle;
+}
+
+.sectionTitle {
+  font-size: 24px;
+  font-weight: 600;
+  color: $text-secondary;
+  margin-bottom: $spacing-lg;
+  font-family: $font-family-body;
+}
+
+.loading {
+  text-align: center;
+  font-size: 18px;
+  color: $text-secondary;
+  padding: $spacing-2xl 0;
+}
+
+.airportGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-md;
+  margin-bottom: $spacing-3xl;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+    gap: $spacing-sm;
+  }
+}
+
+.airportCard {
+  border: 1px solid $border-subtle;
+  padding: $spacing-lg;
+  transition: $transition;
+  background: $bg-primary;
+  cursor: pointer;
+  width: 100%;
+  text-align: center;
+  border-radius: $radius-main;
+
+  &:hover {
+    border-color: $accent-gold;
+    box-shadow: 0 0 20px rgba($accent-gold, 0.15);
+  }
+
+  &.active {
+    border-color: $accent-gold;
+    background: rgba($accent-gold, 0.05);
+  }
+}
+
+.airportCode {
+  font-size: 20px;
+  font-weight: 600;
+  color: $text-primary;
+  margin-bottom: 4px;
+}
+
+.airportName {
+  font-size: 14px;
+  color: $text-secondary;
+}
+
+.priceSection {
+  margin-bottom: $spacing-3xl;
+}
+
+.priceSectionTitle {
+  font-size: 20px;
+  font-weight: 600;
+  color: $text-primary;
+  margin-bottom: $spacing-lg;
+}
+
+.pricingList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.pricingItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-lg;
+  border: 1px solid $border-subtle;
+  border-radius: $radius-main;
+  transition: $transition;
+
+  @include mobile {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $spacing-md;
+  }
+
+  &:hover {
+    border-color: $accent-gold;
+    box-shadow: 0 0 20px rgba($accent-gold, 0.15);
+  }
+}
+
+.pricingInfo {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-xs;
+}
+
+.pricingType {
+  font-size: 20px;
+  font-weight: 600;
+  color: $text-primary;
+}
+
+.pricingActions {
+  display: flex;
+  align-items: center;
+  gap: $spacing-lg;
+
+  @include mobile {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
+
+.pricingPrice {
+  font-size: 28px;
+  font-weight: 600;
+  color: $accent-gold;
+}
+
+.bookButton {
+  padding: 12px 32px;
+  background: $accent-gold;
+  color: $bg-primary;
+  font-weight: 600;
+  border-radius: $radius-main;
+  transition: $transition;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+
+  &:hover {
+    background: $accent-gold-hover;
+    box-shadow: 0 0 20px rgba($accent-gold, 0.3);
+  }
+}
+
+.features {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-xl;
+  margin-top: $spacing-2xl;
+  margin-bottom: $spacing-3xl;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+    gap: $spacing-lg;
+  }
+
+  .feature {
+    @include glass-effect(0.15, 16px);
+    padding: $spacing-xl;
+    border-radius: $radius-lg;
+    text-align: center;
+
+    h3 {
+      font-family: $font-family-display;
+      font-size: 20px;
+      font-weight: 700;
+      color: $text-primary;
+      margin-bottom: $spacing-xs;
+    }
+
+    p {
+      font-size: 15px;
+      color: $text-secondary;
+      line-height: 1.5;
+    }
+  }
+
+  .featureIcon {
+    width: 40px;
+    height: 40px;
+    color: $accent-gold;
+    margin: 0 auto $spacing-md;
+    stroke-width: 1.5;
+  }
+}
+
+.bookingSection {
+  margin-top: $spacing-3xl;
+  padding-top: $spacing-3xl;
+  border-top: 1px solid $border-subtle;
+  scroll-margin-top: 100px;
 }
 
 .section {
@@ -31,7 +240,7 @@
   font-weight: 600;
   color: $text-secondary;
   margin-bottom: $spacing-lg;
-  font-family: $font-body;
+  font-family: $font-family-body;
 }
 
 .loading {

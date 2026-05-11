@@ -2,7 +2,27 @@
 
 import { useLocale } from 'next-intl';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
+import { MapPin, Clock, Car } from 'lucide-react';
 import styles from './Services.module.scss';
+
+const cardVariants = {
+  initial: { opacity: 0, y: 40 },
+  animate: { opacity: 1, y: 0 },
+  hover: { 
+    y: -8,
+    transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] }
+  }
+};
+
+const staggerContainer = {
+  animate: {
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.2
+    }
+  }
+};
 
 export default function Services() {
   const locale = useLocale();
@@ -10,20 +30,29 @@ export default function Services() {
   const services = [
     {
       id: 'intercity',
+      icon: MapPin,
       title: locale === 'ru' ? 'Междугород' : 'Intercity rides',
-      description: locale === 'ru' ? 'Москва — Санкт-Петербург' : 'Moscow — Saint Petersburg',
+      description: locale === 'ru' 
+        ? 'Комфортные поездки между городами. Москва — Санкт-Петербург и другие направления.'
+        : 'Comfortable intercity trips. Moscow — Saint Petersburg and other destinations.',
       link: `/${locale}/routes`
     },
     {
       id: 'airport',
+      icon: Clock,
       title: locale === 'ru' ? 'Аэропорт' : 'Airport transfer',
-      description: locale === 'ru' ? 'Встреча и трансфер' : 'Meet & transfer',
+      description: locale === 'ru' 
+        ? 'Встреча в аэропорту с табличкой. Помощь с багажом. Отслеживание рейса.'
+        : 'Airport meet & greet with signage. Baggage assistance. Flight tracking.',
       link: `/${locale}/airport`
     },
     {
       id: 'hourly',
-      title: locale === 'ru' ? 'Почасовая' : 'Hourly rental',
-      description: locale === 'ru' ? 'От 3 часов' : 'From 3 hours',
+      icon: Car,
+      title: locale === 'ru' ? 'Почасовая аренда' : 'Hourly rental',
+      description: locale === 'ru' 
+        ? 'Автомобиль с водителем на несколько часов. Минимум 3 часа.'
+        : 'Car with driver for several hours. Minimum 3 hours.',
       link: `/${locale}/hourly`
     }
   ];
@@ -31,16 +60,32 @@ export default function Services() {
   return (
     <section className={styles.services}>
       <div className={styles.container}>
-        <div className={styles.grid}>
-          {services.map((service) => (
-            <Link key={service.id} href={service.link}>
-              <div className={styles.service}>
-                <h3 className={styles.title}>{service.title}</h3>
-                <p className={styles.description}>{service.description}</p>
-              </div>
-            </Link>
-          ))}
-        </div>
+        <motion.div 
+          className={styles.grid}
+          variants={staggerContainer}
+          initial="initial"
+          whileInView="animate"
+          viewport={{ once: true, margin: "-100px" }}
+        >
+          {services.map((service) => {
+            const Icon = service.icon;
+            return (
+              <Link key={service.id} href={service.link}>
+                <motion.div 
+                  className={styles.serviceCard}
+                  variants={cardVariants}
+                  whileHover="hover"
+                >
+                  <div className={styles.iconWrapper}>
+                    <Icon className={styles.icon} />
+                  </div>
+                  <h3 className={styles.title}>{service.title}</h3>
+                  <p className={styles.description}>{service.description}</p>
+                </motion.div>
+              </Link>
+            );
+          })}
+        </motion.div>
       </div>
     </section>
   );

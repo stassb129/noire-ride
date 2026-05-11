@@ -2,6 +2,7 @@
 
 import { useLocale } from 'next-intl';
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { apiClient } from '@/lib/api/client';
 import styles from './BookingCard.module.scss';
 
@@ -30,7 +31,7 @@ export default function BookingCard() {
         customerEmail: formData.get('email') as string,
         customerPhone: formData.get('phone') as string,
         notes: formData.get('notes') as string,
-        price: 0, // Will be calculated on backend
+        price: 0,
       };
 
       await apiClient.createBooking(booking);
@@ -45,7 +46,12 @@ export default function BookingCard() {
   };
 
   return (
-    <div className={styles.card}>
+    <motion.div 
+      className={styles.card}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+    >
       <h3 className={styles.title}>
         {locale === 'ru' ? 'Забронировать' : 'Book a ride'}
       </h3>
@@ -195,7 +201,13 @@ export default function BookingCard() {
         </div>
 
         {error && (
-          <p className={styles.error}>{error}</p>
+          <motion.p 
+            className={styles.error}
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            {error}
+          </motion.p>
         )}
 
         <p className={styles.notice}>
@@ -204,16 +216,18 @@ export default function BookingCard() {
             : 'We will contact you to confirm the booking'}
         </p>
 
-        <button
+        <motion.button
           type="submit"
           className={styles.submitButton}
           disabled={isSubmitting}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
         >
           {isSubmitting 
             ? (locale === 'ru' ? 'Отправка...' : 'Sending...') 
             : (locale === 'ru' ? 'Забронировать' : 'Book now')}
-        </button>
+        </motion.button>
       </form>
-    </div>
+    </motion.div>
   );
 }

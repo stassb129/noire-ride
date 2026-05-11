@@ -23,21 +23,37 @@
   pointer-events: none;
   isolation: isolate;
   transform: translate3d(0, 0, 0);
-  // Force separate compositor layer to prevent flickering
-  opacity: 0.8;
+  opacity: 0.9;
+
+  &::before {
+    content: '';
+    @include absolute-fill;
+    background: linear-gradient(135deg,
+        rgba(#000, 0.7) 0%,
+        rgba(#000, 0.5) 50%,
+        rgba(#000, 0.8) 100%);
+    z-index: 1;
+  }
+}
+
+.overlay {
+  @include absolute-fill;
+  background: linear-gradient(to right,
+      rgba(#000, 0.9) 0%,
+      rgba(#000, 0.4) 50%,
+      rgba(#000, 0.7) 100%);
+  z-index: 1;
 }
 
 .videoBackground {
   position: absolute;
-  top: -10%;
   left: 0;
   width: 100%;
-  height: 120%;
+  height: 110%;
   object-fit: cover;
   object-position: center calc(50% - 120px);
   pointer-events: none;
   @include gpu-accelerate;
-  // Optimize video rendering
   image-rendering: -webkit-optimize-contrast;
   image-rendering: crisp-edges;
 }
@@ -52,7 +68,7 @@
   transform: translateZ(0);
 
   @include mobile {
-    padding: 0 $spacing-sm;
+    padding: 0 $spacing-md;
   }
 }
 
@@ -76,11 +92,11 @@
 }
 
 .content {
-  @include fade-in;
+  max-width: 600px;
 }
 
 .headline {
-  font-family: $font-display;
+  font-family: $font-family-display;
   font-size: clamp(48px, 7vw, 72px);
   font-weight: 800;
   line-height: 1.05;
@@ -96,8 +112,8 @@
 
 .subtext {
   font-size: clamp(18px, 2.5vw, 24px);
-  color: $text-secondary;
-  font-weight: 400;
+  color: $accent-gold;
+  font-weight: 500;
   line-height: 1.5;
 
   @include mobile {
@@ -106,7 +122,6 @@
 }
 
 .bookingCardWrapper {
-  @include fade-in(0.8s, 0.2s);
   margin-bottom: 40px;
 
   @media (max-width: $breakpoint-desktop - 1) {

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useLocale } from 'next-intl';
-import { fetchWithAuth } from '@/lib/auth/api';
+import { fetchWithAuth } from '@/lib/utils/fetchWithAuth';
 import styles from './dashboard.module.scss';
 
 interface Statistics {

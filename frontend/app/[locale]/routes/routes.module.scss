@@ -14,12 +14,246 @@
 }
 
 .heading {
-  font-family: $font-display;
+  font-family: $font-family-display;
   font-size: clamp(48px, 6vw, 64px);
   font-weight: 800;
-  margin-bottom: $spacing-2xl;
+  margin-bottom: $spacing-lg;
   color: $text-primary;
   letter-spacing: -0.03em;
+  text-align: center;
+}
+
+.description {
+  font-size: 18px;
+  color: $text-secondary;
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto $spacing-2xl;
+  line-height: 1.6;
+}
+
+.availabilitySection {
+  margin-top: $spacing-3xl;
+  padding-top: $spacing-3xl;
+  border-top: 1px solid $border-subtle;
+}
+
+.sectionTitle {
+  font-family: $font-family-display;
+  font-size: 32px;
+  font-weight: 700;
+  color: $text-primary;
+  margin-bottom: $spacing-xl;
+}
+
+.dateSelector {
+  margin-bottom: $spacing-2xl;
+}
+
+.dateLabel {
+  display: block;
+  font-size: 13px;
+  color: $text-secondary;
+  margin-bottom: $spacing-xs;
+  font-weight: 500;
+}
+
+.dateInput {
+  height: 56px;
+  background: $bg-secondary;
+  border: 1px solid $border-subtle;
+  border-radius: $radius-main;
+  padding: 0 $spacing-sm;
+  color: $text-primary;
+  font-size: 15px;
+  transition: $transition;
+  outline: none;
+  max-width: 240px;
+
+  &:focus {
+    border-color: $accent-gold;
+  }
+}
+
+.routesList {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2xl;
+  margin-bottom: $spacing-3xl;
+}
+
+.route {
+  border-top: 1px solid $border-subtle;
+  padding-top: $spacing-2xl;
+}
+
+.routeHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-xl;
+  flex-wrap: wrap;
+  gap: $spacing-md;
+
+  @include mobile {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.routeDirection {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+}
+
+.routeCity {
+  font-family: $font-family-display;
+  font-size: clamp(28px, 4vw, 36px);
+  font-weight: 700;
+  color: $text-primary;
+  letter-spacing: -0.02em;
+}
+
+.routeArrow {
+  color: $text-muted;
+  font-size: 24px;
+}
+
+.routePrice {
+  font-size: 20px;
+  color: $accent-gold;
+  font-weight: 600;
+}
+
+.seatsInfo {
+  display: flex;
+  align-items: center;
+  gap: $spacing-lg;
+  margin-bottom: $spacing-lg;
+  flex-wrap: wrap;
+  transition: opacity 0.3s ease;
+
+  &.loading {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+}
+
+.seatIndicators {
+  display: flex;
+  gap: $spacing-xs;
+}
+
+.seatDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  transition: $transition;
+}
+
+.seatAvailable {
+  background: transparent;
+  border: 2px solid $accent-gold;
+}
+
+.seatTaken {
+  background: $accent-gold;
+  border: 2px solid $accent-gold;
+}
+
+.seatStatus {
+  color: $text-secondary;
+  font-size: 15px;
+}
+
+.loading,
+.loadingSeats,
+.noRoutes {
+  text-align: center;
+  font-size: 18px;
+  color: $text-secondary;
+  padding: $spacing-xl 0;
+}
+
+.features {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-xl;
+  margin-top: $spacing-2xl;
+  margin-bottom: $spacing-3xl;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+    gap: $spacing-lg;
+  }
+
+  .feature {
+    @include glass-effect(0.15, 16px);
+    padding: $spacing-xl;
+    border-radius: $radius-lg;
+    text-align: center;
+
+    h3 {
+      font-family: $font-family-display;
+      font-size: 20px;
+      font-weight: 700;
+      color: $text-primary;
+      margin-bottom: $spacing-xs;
+    }
+
+    p {
+      font-size: 15px;
+      color: $text-secondary;
+      line-height: 1.5;
+    }
+  }
+
+  .featureIcon {
+    width: 40px;
+    height: 40px;
+    color: $accent-gold;
+    margin: 0 auto $spacing-md;
+    stroke-width: 1.5;
+  }
+}
+
+.selectButton {
+  padding: 12px 32px;
+  background: $accent-gold;
+  color: $bg-primary;
+  font-weight: 600;
+  border-radius: $radius-main;
+  transition: $transition;
+  border: none;
+  cursor: pointer;
+  margin-top: $spacing-md;
+
+  @include mobile {
+    width: 100%;
+  }
+
+  &:hover:not(:disabled) {
+    background: $accent-gold-hover;
+    box-shadow: 0 0 20px rgba($accent-gold, 0.3);
+  }
+
+  &:disabled {
+    background: $border-subtle;
+    color: $text-muted;
+    cursor: not-allowed;
+
+    &:hover {
+      box-shadow: none;
+    }
+  }
+}
+
+.bookingSection {
+  margin-top: $spacing-3xl;
+  padding-top: $spacing-3xl;
+  border-top: 1px solid $border-subtle;
+  scroll-margin-top: 100px;
 }
 
 .loading,
@@ -92,7 +326,7 @@
 }
 
 .routeCity {
-  font-family: $font-display;
+  font-family: $font-family-display;
   font-size: clamp(28px, 4vw, 36px);
   font-weight: 700;
   color: $text-primary;
@@ -116,6 +350,12 @@
   gap: $spacing-lg;
   margin-bottom: $spacing-lg;
   flex-wrap: wrap;
+  transition: opacity 0.3s ease;
+
+  &.loading {
+    opacity: 0.5;
+    pointer-events: none;
+  }
 }
 
 
@@ -132,11 +372,13 @@
 }
 
 .seatAvailable {
-  background: $accent-gold;
+  background: transparent;
+  border: 2px solid $accent-gold;
 }
 
 .seatTaken {
-  background: $border-subtle;
+  background: $accent-gold;
+  border: 2px solid $accent-gold;
 }
 
 .seatStatus {

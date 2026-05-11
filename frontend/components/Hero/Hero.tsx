@@ -2,8 +2,24 @@
 
 import { useLocale } from 'next-intl';
 import { useEffect, useRef } from 'react';
-import BookingCard from '../BookingCard/BookingCard';
+import { motion } from 'framer-motion';
+import ContactForm from '../ContactForm/ContactForm';
 import styles from './Hero.module.scss';
+
+const fadeInUp = {
+  initial: { opacity: 0, y: 40 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] }
+};
+
+const staggerContainer = {
+  animate: {
+    transition: {
+      staggerChildren: 0.15,
+      delayChildren: 0.1
+    }
+  }
+};
 
 export default function Hero() {
   const locale = useLocale();
@@ -14,9 +30,8 @@ export default function Hero() {
       if (!videoRef.current) return;
       
       const scrollY = window.scrollY;
-      const parallaxSpeed = 0.5; // Video moves 50% slower than scroll
+      const parallaxSpeed = 0.5;
       
-      // Apply parallax transform
       requestAnimationFrame(() => {
         if (videoRef.current) {
           videoRef.current.style.transform = `translate3d(0, ${scrollY * parallaxSpeed}px, 0)`;
@@ -30,8 +45,8 @@ export default function Hero() {
 
   return (
     <section className={styles.hero}>
-      {/* Video Container with Parallax */}
       <div ref={videoRef} className={styles.videoContainer}>
+        <div className={styles.overlay} />
         <video
           autoPlay
           loop
@@ -46,8 +61,13 @@ export default function Hero() {
       </div>
 
       <div className={styles.container}>
-        <div className={styles.grid}>
-          <div className={styles.content}>
+        <motion.div 
+          className={styles.grid}
+          variants={staggerContainer}
+          initial="initial"
+          animate="animate"
+        >
+          <motion.div className={styles.content} variants={fadeInUp}>
             <h1 className={styles.headline}>
               {locale === 'ru' 
                 ? 'Премиум-поездки без компромиссов'
@@ -59,12 +79,12 @@ export default function Hero() {
                 ? 'Москва — Санкт-Петербург от 10,000₽'
                 : 'Moscow — Saint Petersburg from 10,000₽'}
             </p>
-          </div>
+          </motion.div>
 
-          <div className={styles.bookingCardWrapper}>
-            <BookingCard />
-          </div>
-        </div>
+          <motion.div className={styles.bookingCardWrapper} variants={fadeInUp}>
+            <ContactForm />
+          </motion.div>
+        </motion.div>
       </div>
     </section>
   );

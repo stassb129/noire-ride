@@ -3,46 +3,68 @@
 
 .fleet {
   padding: $section-padding 0;
-  background: $bg-secondary;
+  background: $bg-primary;
+
+  @include mobile {
+    padding: 80px 0;
+  }
 }
 
 .container {
   max-width: $container-max;
   margin: 0 auto;
-  padding: 0 $spacing-lg;
+  padding: 0 $container-padding;
 }
 
 .heading {
-  font-family: $font-display;
+  font-family: $font-family-display;
   font-size: clamp(40px, 5vw, 56px);
   font-weight: 800;
-  margin-bottom: $spacing-2xl;
+  margin-bottom: $spacing-4xl;
   color: $text-primary;
   letter-spacing: -0.03em;
+
+  @include mobile {
+    margin-bottom: $spacing-3xl;
+  }
 }
 
 .vehicleList {
-  display: flex;
-  flex-direction: column;
-  gap: $spacing-md;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-xl;
+
+  @include mobile {
+    grid-template-columns: 1fr;
+    gap: $spacing-md;
+  }
 }
 
 .vehicle {
   position: relative;
-  height: 480px;
+  height: 420px;
   overflow: hidden;
   cursor: pointer;
+  border-radius: $radius-lg;
+  border: 1px solid $border-subtle;
   transition: $transition;
 
-  &:hover {
-    box-shadow: 0 0 40px rgba($accent-gold, 0.2);
+  @include mobile {
+    height: 380px;
+  }
 
-    .vehicleImage {
-      transform: scale(1.05);
-    }
+  &:hover {
+    border-color: rgba($accent-gold, 0.3);
+    box-shadow: $shadow-lg;
+    transform: translateY(-4px);
 
     .vehicleName {
       color: $accent-gold;
+    }
+
+    .specs {
+      opacity: 1;
+      transform: translateY(0);
     }
   }
 }
@@ -51,7 +73,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: $transition;
+  transition: transform 0.6s ease;
 }
 
 .vehicleOverlay {
@@ -59,9 +81,10 @@
   background: linear-gradient(
     to top,
     rgba($bg-primary, 0.95) 0%,
-    rgba($bg-primary, 0.4) 50%,
+    rgba($bg-primary, 0.5) 40%,
     transparent 100%
   );
+  pointer-events: none;
 }
 
 .vehicleContent {
@@ -69,26 +92,74 @@
   bottom: 0;
   left: 0;
   right: 0;
-  padding: $spacing-xl;
+  padding: $spacing-xl $spacing-lg;
   z-index: 2;
 
-  @include tablet {
-    padding: $spacing-2xl;
+  @include mobile {
+    padding: $spacing-lg $spacing-md;
   }
 }
 
 .vehicleName {
-  font-family: $font-display;
-  font-size: clamp(32px, 4vw, 48px);
+  font-family: $font-family-display;
+  font-size: clamp(20px, 2.5vw, 28px);
   font-weight: 800;
-  margin-bottom: $spacing-sm;
+  margin-bottom: $spacing-xs;
   transition: $transition;
   color: $text-primary;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
 }
 
 .vehicleDescription {
-  font-size: 18px;
+  font-size: 14px;
   color: $text-secondary;
-  line-height: 1.6;
+  line-height: $line-height-body;
+  margin-bottom: $spacing-md;
+
+  @include mobile {
+    font-size: 13px;
+    margin-bottom: $spacing-sm;
+  }
+}
+
+.specs {
+  display: flex;
+  gap: $spacing-md;
+  opacity: 1;
+  transform: translateY(0);
+  transition: all 0.4s ease;
+
+  @include mobile {
+    gap: $spacing-sm;
+    flex-wrap: wrap;
+  }
+}
+
+.spec {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+}
+
+.specIcon {
+  width: 18px;
+  height: 18px;
+  color: $accent-gold;
+  flex-shrink: 0;
+
+  @include mobile {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.specValue {
+  font-size: 13px;
+  font-weight: 500;
+  color: $text-primary;
+  white-space: nowrap;
+
+  @include mobile {
+    font-size: 12px;
+  }
 }

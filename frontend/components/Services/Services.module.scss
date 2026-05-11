@@ -3,13 +3,18 @@
 
 .services {
   padding: $section-padding 0;
-  background: $bg-primary;
+  background: $bg-secondary;
+  position: relative;
+
+  @include mobile {
+    padding: 80px 0;
+  }
 }
 
 .container {
   max-width: $container-max;
   margin: 0 auto;
-  padding: 0 $spacing-lg;
+  padding: 0 $container-padding;
 }
 
 .grid {
@@ -19,18 +24,38 @@
 
   @include tablet {
     grid-template-columns: repeat(3, 1fr);
-    gap: 60px;
+    gap: $spacing-xl;
+  }
+
+  @include mobile {
+    gap: $spacing-lg;
   }
 }
 
-.service {
-  border-top: 1px solid $border-subtle;
-  padding-top: $spacing-lg;
+.serviceCard {
+  background: $glass-bg;
+  backdrop-filter: blur(20px);
+  border: 1px solid $border-subtle;
+  border-radius: $radius-lg;
+  padding: $spacing-3xl $spacing-xl;
   transition: $transition;
   cursor: pointer;
+  text-align: center;
+
+  @include mobile {
+    padding: $spacing-2xl $spacing-lg;
+  }
 
   &:hover {
-    border-top-color: $accent-gold;
+    border-color: rgba($accent-gold, 0.3);
+    box-shadow: $shadow-lg;
+    background: rgba($accent-gold, 0.02);
+
+    .iconWrapper {
+      background: rgba($accent-gold, 0.2);
+      border-color: $accent-gold;
+      transform: scale(1.1) rotate(-5deg);
+    }
 
     .title {
       color: $accent-gold;
@@ -38,18 +63,59 @@
   }
 }
 
+.iconWrapper {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto $spacing-xl;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba($accent-gold, 0.1);
+  border: 2px solid rgba($accent-gold, 0.2);
+  transition: $transition;
+
+  @include mobile {
+    width: 56px;
+    height: 56px;
+    margin-bottom: $spacing-lg;
+  }
+}
+
+.icon {
+  width: 32px;
+  height: 32px;
+  color: $accent-gold;
+
+  @include mobile {
+    width: 28px;
+    height: 28px;
+  }
+}
+
 .title {
-  font-family: $font-display;
-  font-size: clamp(24px, 3vw, 32px);
+  font-family: $font-family-display;
+  font-size: 24px;
   font-weight: 700;
-  margin-bottom: $spacing-sm;
+  margin-bottom: $spacing-md;
   transition: $transition;
   color: $text-primary;
   letter-spacing: -0.02em;
+
+  @include mobile {
+    font-size: 20px;
+    margin-bottom: $spacing-sm;
+  }
 }
 
 .description {
   color: $text-secondary;
-  font-size: 16px;
-  line-height: 1.6;
+  font-size: 15px;
+  line-height: $line-height-body;
+  max-width: 280px;
+  margin: 0 auto;
+
+  @include mobile {
+    font-size: 14px;
+  }
 }

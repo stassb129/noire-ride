@@ -1,0 +1,153 @@
+@use '../../styles/scss/variables' as *;
+@use '../../styles/scss/mixins' as *;
+
+.guarantees {
+  padding: $section-padding 0;
+  background: $bg-secondary;
+  position: relative;
+
+  @include mobile {
+    padding: 80px 0;
+  }
+}
+
+.container {
+  max-width: $container-max;
+  margin: 0 auto;
+  padding: 0 $container-padding;
+}
+
+.content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $spacing-4xl;
+  align-items: center;
+
+  @include desktop {
+    grid-template-columns: 1fr;
+    gap: $spacing-3xl;
+  }
+}
+
+.textBlock {
+  max-width: 560px;
+
+  @include desktop {
+    max-width: 100%;
+  }
+}
+
+.title {
+  font-family: $font-family-display;
+  font-size: clamp(36px, 5vw, 48px);
+  font-weight: 800;
+  color: $text-primary;
+  margin-bottom: $spacing-lg;
+  letter-spacing: -0.02em;
+}
+
+.description {
+  font-size: 16px;
+  color: $text-secondary;
+  line-height: $line-height-body;
+  margin-bottom: $spacing-2xl;
+
+  @include mobile {
+    font-size: 15px;
+    margin-bottom: $spacing-xl;
+  }
+}
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-md;
+}
+
+.listItem {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-md;
+  font-size: 15px;
+  color: $text-primary;
+  line-height: $line-height-body;
+
+  @include mobile {
+    font-size: 14px;
+    gap: $spacing-sm;
+  }
+}
+
+.checkIcon {
+  width: 22px;
+  height: 22px;
+  color: $accent-gold;
+  flex-shrink: 0;
+  margin-top: 2px;
+
+  @include mobile {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.imageBlock {
+  @include desktop {
+    order: -1;
+  }
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: $spacing-lg;
+
+  @include mobile {
+    gap: $spacing-md;
+  }
+}
+
+.statCard {
+  background: $glass-bg;
+  backdrop-filter: blur(20px);
+  border: 1px solid $border-subtle;
+  border-radius: $radius-lg;
+  padding: $spacing-2xl;
+  text-align: center;
+  transition: $transition;
+
+  @include mobile {
+    padding: $spacing-xl;
+  }
+
+  &:hover {
+    border-color: rgba($accent-gold, 0.3);
+    box-shadow: $shadow-md;
+    transform: translateY(-4px);
+  }
+}
+
+.statValue {
+  font-family: $font-family-display;
+  font-size: clamp(36px, 5vw, 56px);
+  font-weight: 800;
+  color: $accent-gold;
+  line-height: 1;
+  margin-bottom: $spacing-sm;
+  letter-spacing: -0.02em;
+}
+
+.statLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: $text-secondary;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+
+  @include mobile {
+    font-size: 11px;
+  }
+}

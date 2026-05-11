@@ -11,12 +11,15 @@ import { HourlyPricing } from './entities/hourly-pricing.entity';
 import { AirportPricing } from './entities/airport-pricing.entity';
 import { IntercityPricing } from './entities/intercity-pricing.entity';
 import { AdminUser } from './entities/admin-user.entity';
+import { Contact } from './entities/contact.entity';
+import { RouteBooking, AirportBooking, HourlyBooking } from './entities/specialized-bookings.entity';
 
 // Modules
 import { PricingModule } from './pricing/pricing.module';
 import { BookingModule } from './booking/booking.module';
 import { AuthModule } from './auth/auth.module';
 import { AdminModule } from './admin/admin.module';
+import { ContactsModule } from './contacts/contacts.module';
 
 @Module({
   imports: [
@@ -41,6 +44,10 @@ import { AdminModule } from './admin/admin.module';
         AirportPricing,
         IntercityPricing,
         AdminUser,
+        Contact,
+        RouteBooking,
+        AirportBooking,
+        HourlyBooking,
       ],
       synchronize: process.env.NODE_ENV === 'development',
       logging: process.env.NODE_ENV === 'development',
@@ -50,6 +57,7 @@ import { AdminModule } from './admin/admin.module';
     BookingModule,
     AuthModule,
     AdminModule,
+    ContactsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

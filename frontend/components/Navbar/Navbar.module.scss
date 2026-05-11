@@ -13,15 +13,18 @@
   contain: layout style paint;
 
   &.scrolled {
-    background: rgba(11, 11, 11, 0.95);
+    background: rgba(10, 10, 10, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
     border-bottom: 1px solid $border-subtle;
+    box-shadow: $shadow-sm;
   }
 }
 
 .container {
   max-width: $container-max;
   margin: 0 auto;
-  padding: 0 $spacing-lg;
+  padding: 0 $container-padding;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -29,17 +32,21 @@
 
   @include mobile {
     height: 60px;
-    padding: 0 $spacing-sm;
   }
 }
 
 .logo {
-  font-family: $font-display;
+  font-family: $font-family-display;
   font-size: 20px;
   font-weight: 800;
   letter-spacing: 0.08em;
   display: flex;
   gap: $spacing-xs;
+  transition: $transition;
+
+  &:hover {
+    transform: translateY(-2px);
+  }
 }
 
 .logoNoir {
@@ -73,7 +80,7 @@
     bottom: -4px;
     left: 0;
     width: 0;
-    height: 1px;
+    height: 2px;
     background: $accent-gold;
     transition: $transition;
   }
@@ -95,53 +102,77 @@
   font-weight: 600;
   transition: $transition;
   border-radius: $radius-sm;
+  display: inline-block;
 
   &:hover {
-    background: $accent-gold-hover;
-    box-shadow: 0 0 20px rgba($accent-gold, 0.3);
+    background: $text-primary;
+    box-shadow: 0 4px 16px rgba($accent-gold, 0.4);
+    transform: translateY(-2px);
   }
 }
 
 .langSwitch {
   color: $text-secondary;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   transition: $transition;
+  padding: 8px 12px;
+  border-radius: $radius-sm;
 
   &:hover {
     color: $accent-gold;
+    background: rgba($accent-gold, 0.1);
   }
 }
 
 .menuButton {
   display: block;
   color: $text-primary;
+  transition: $transition;
+
+  @include tablet {
+    display: none;
+  }
+
+  &:hover {
+    color: $accent-gold;
+  }
+}
+
+.mobileMenu {
+  overflow: hidden;
+  border-top: 1px solid $border-subtle;
+  background: rgba(10, 10, 10, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 
   @include tablet {
     display: none;
   }
 }
 
-.mobileMenu {
+.mobileMenuContent {
   display: flex;
   flex-direction: column;
   gap: $spacing-xs;
-  padding: $spacing-lg $spacing-md;
-  border-top: 1px solid $border-subtle;
+  padding: $spacing-lg $container-padding;
 
-  @include tablet {
-    display: none;
-  }
-
-  .navLink,
-  .langSwitch {
-    padding: $spacing-sm 0;
+  .navLink {
+    padding: $spacing-md 0;
     font-size: 16px;
     display: block;
     width: 100%;
+    border-bottom: 1px solid $border-subtle;
+  }
+
+  .ctaButton {
+    margin-top: $spacing-md;
+    text-align: center;
   }
 
   .langSwitch {
     text-align: left;
+    width: 100%;
+    margin-top: $spacing-sm;
   }
 }

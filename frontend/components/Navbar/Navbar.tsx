@@ -4,7 +4,39 @@ import { useLocale } from 'next-intl';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import styles from './Navbar.module.scss';
+
+const navbarVariants = {
+  hidden: { y: -100, opacity: 0 },
+  visible: { 
+    y: 0, 
+    opacity: 1,
+    transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] }
+  }
+};
+
+const mobileMenuVariants = {
+  hidden: { 
+    height: 0, 
+    opacity: 0,
+    transition: { duration: 0.3, ease: 'easeInOut' }
+  },
+  visible: { 
+    height: 'auto', 
+    opacity: 1,
+    transition: { duration: 0.3, ease: 'easeInOut' }
+  }
+};
+
+const linkVariants = {
+  hidden: { opacity: 0, x: -20 },
+  visible: (i: number) => ({
+    opacity: 1,
+    x: 0,
+    transition: { delay: i * 0.1, duration: 0.3 }
+  })
+};
 
 export default function Navbar() {
   const locale = useLocale();
@@ -16,7 +48,7 @@ export default function Navbar() {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
     };
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -33,7 +65,12 @@ export default function Navbar() {
   ];
 
   return (
-    <nav className={`${styles.navbar} ${scrolled || isMenuOpen ? styles.scrolled : ''}`}>
+    <motion.nav 
+      className={`${styles.navbar} ${scrolled || isMenuOpen ? styles.scrolled : ''}`}
+      variants={navbarVariants}
+      initial="hidden"
+      animate="visible"
+    >
       <div className={styles.container}>
         <Link href={`/${locale}`} className={styles.logo}>
           <span className={styles.logoNoir}>NOIR</span>
@@ -47,9 +84,11 @@ export default function Navbar() {
             </Link>
           ))}
           
-          <Link href={`/${locale}#booking`} className={styles.ctaButton}>
-            {locale === 'ru' ? 'Забронировать' : 'Book'}
-          </Link>
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Link href={`/${locale}#booking`} className={styles.ctaButton}>
+              {locale === 'ru' ? 'Забронировать' : 'Book'}
+            </Link>
+          </motion.div>
 
           <button onClick={switchLocale} className={styles.langSwitch}>
             {locale === 'ru' ? 'EN' : 'RU'}
@@ -59,6 +98,7 @@ export default function Navbar() {
         <button
           onClick={() => setIsMenuOpen(!isMenuOpen)}
           className={styles.menuButton}
+          aria-label="Toggle menu"
         >
           <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2">
             {isMenuOpen ? (
@@ -70,32 +110,61 @@ export default function Navbar() {
         </button>
       </div>
 
-      {isMenuOpen && (
-        <div className={styles.mobileMenu}>
-          <div className={styles.container} style={{ flexDirection: 'column', height: 'auto', alignItems: 'flex-start' }}>
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={styles.navLink}
-                onClick={() => setIsMenuOpen(false)}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.div 
+            className={styles.mobileMenu}
+            variants={mobileMenuVariants}
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+          >
+            <div className={styles.mobileMenuContent}>
+              {navLinks.map((link, i) => (
+                <motion.div
+                  key={link.href}
+                  custom={i}
+                  variants={linkVariants}
+                  initial="hidden"
+                  animate="visible"
+                >
+                  <Link
+                    href={link.href}
+                    className={styles.navLink}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {link.label}
+                  </Link>
+                </motion.div>
+              ))}
+              <motion.div
+                custom={navLinks.length}
+                variants={linkVariants}
+                initial="hidden"
+                animate="visible"
               >
-                {link.label}
-              </Link>
-            ))}
-            <Link
-              href={`/${locale}#booking`}
-              className={styles.navLink}
-              onClick={() => setIsMenuOpen(false)}
-            >
-              {locale === 'ru' ? 'Забронировать' : 'Book'}
-            </Link>
-            <button onClick={switchLocale} className={styles.langSwitch}>
-              {locale === 'ru' ? 'EN' : 'RU'}
-            </button>
-          </div>
-        </div>
-      )}
-    </nav>
+                <Link
+                  href={`/${locale}#booking`}
+                  className={styles.ctaButton}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {locale === 'ru' ? 'Забронировать' : 'Book'}
+                </Link>
+              </motion.div>
+              <motion.button 
+                onClick={switchLocale} 
+                className={styles.langSwitch}
+                custom={navLinks.length + 1}
+                variants={linkVariants}
+                initial="hidden"
+                animate="visible"
+              >
+                {locale === 'ru' ? 'EN' : 'RU'}
+              </motion.button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.nav>
   );
 }

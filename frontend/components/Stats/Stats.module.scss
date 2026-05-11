@@ -1,0 +1,103 @@
+@use '../../styles/scss/variables' as *;
+@use '../../styles/scss/mixins' as *;
+
+.stats {
+  padding: $section-padding 0;
+  background: $bg-primary;
+  position: relative;
+  overflow: hidden;
+
+  @include mobile {
+    padding: 80px 0;
+  }
+}
+
+.container {
+  max-width: $container-max;
+  margin: 0 auto;
+  padding: 0 $container-padding;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: $spacing-lg;
+
+  @include desktop {
+    grid-template-columns: repeat(2, 1fr);
+    gap: $spacing-md;
+  }
+
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.statCard {
+  background: $glass-bg;
+  backdrop-filter: blur(20px);
+  border: 1px solid $border-subtle;
+  border-radius: $radius-lg;
+  padding: $spacing-2xl $spacing-xl;
+  text-align: center;
+  transition: $transition;
+  cursor: default;
+
+  &:hover {
+    border-color: rgba($accent-gold, 0.3);
+    box-shadow: $shadow-lg;
+    transform: translateY(-6px);
+  }
+}
+
+.iconWrapper {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto $spacing-lg;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba($accent-gold, 0.1);
+  border: 1px solid rgba($accent-gold, 0.2);
+  transition: $transition;
+
+  .statCard:hover & {
+    background: rgba($accent-gold, 0.15);
+    border-color: rgba($accent-gold, 0.4);
+    transform: scale(1.1);
+  }
+}
+
+.icon {
+  width: 28px;
+  height: 28px;
+  color: $accent-gold;
+}
+
+.value {
+  font-size: 48px;
+  font-weight: 700;
+  font-family: $font-family-display;
+  color: $text-primary;
+  margin-bottom: $spacing-sm;
+  line-height: 1;
+  letter-spacing: -0.02em;
+
+  @include mobile {
+    font-size: 40px;
+  }
+}
+
+.label {
+  font-size: 18px;
+  font-weight: 600;
+  color: $accent-gold;
+  margin-bottom: $spacing-xs;
+}
+
+.description {
+  font-size: 14px;
+  color: $text-secondary;
+  line-height: $line-height-body;
+}

@@ -1,41 +1,12 @@
 'use client';
 
 import { useLocale } from 'next-intl';
-import { useState, useEffect } from 'react';
-import { apiClient, HourlyPricing } from '@/lib/api/client';
+import HourlyBookingForm from '@/components/HourlyBookingForm/HourlyBookingForm';
+import { MapPin, Clock, BriefcaseBusiness } from 'lucide-react';
 import styles from './hourly.module.scss';
 
 export default function HourlyPage() {
   const locale = useLocale();
-  const [pricing, setPricing] = useState<HourlyPricing[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchPricing = async () => {
-      try {
-        const data = await apiClient.getHourlyPricing();
-        setPricing(data);
-      } catch (error) {
-        console.error('Error fetching hourly pricing:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPricing();
-  }, []);
-
-  if (loading) {
-    return (
-      <div className={styles.hourlyPage}>
-        <div className={styles.container}>
-          <p className={styles.loading}>
-            {locale === 'ru' ? 'Загрузка...' : 'Loading...'}
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className={styles.hourlyPage}>
@@ -44,29 +15,35 @@ export default function HourlyPage() {
           {locale === 'ru' ? 'Почасовая аренда' : 'Hourly rental'}
         </h1>
 
-        <p className={styles.subheading}>
+        <p className={styles.description}>
           {locale === 'ru' 
-            ? 'Минимальная аренда — 3 часа'
-            : 'Minimum rental — 3 hours'}
+            ? 'Возьмите автомобиль с водителем на несколько часов для деловых встреч, поездок по городу или личных дел. Минимальная аренда — 3 часа.'
+            : 'Rent a car with a driver for several hours for business meetings, city trips or personal errands. Minimum rental — 3 hours.'}
         </p>
 
-        <div className={styles.pricingGrid}>
-          {pricing.map((item) => (
-            <div key={item.id} className={styles.priceCard}>
-              <h3 className={styles.vehicleName}>{item.vehicleName}</h3>
-              <div className={styles.priceAmount}>
-                {item.pricePerHour.toLocaleString()}₽
-                <span className={styles.perHour}>
-                  {locale === 'ru' ? '/час' : '/hour'}
-                </span>
-              </div>
-              <p className={styles.minimum}>
-                {locale === 'ru' ? 'Минимум ' : 'Minimum '}
-                {item.minimumHours}
-                {locale === 'ru' ? ' часа' : ' hours'}
-              </p>
-            </div>
-          ))}
+        <div className={styles.features}>
+          <div className={styles.feature}>
+            <MapPin className={styles.featureIcon} />
+            <h3>{locale === 'ru' ? 'Гибкие маршруты' : 'Flexible routes'}</h3>
+            <p>{locale === 'ru' ? 'Планируйте маршрут по своему усмотрению' : 'Plan your route as you wish'}</p>
+          </div>
+          <div className={styles.feature}>
+            <Clock className={styles.featureIcon} />
+            <h3>{locale === 'ru' ? 'Без ожидания' : 'No waiting'}</h3>
+            <p>{locale === 'ru' ? 'Водитель ждёт вас в течение всей аренды' : 'Driver waits for you during entire rental'}</p>
+          </div>
+          <div className={styles.feature}>
+            <BriefcaseBusiness className={styles.featureIcon} />
+            <h3>{locale === 'ru' ? 'Оптимальный выбор' : 'Best choice'}</h3>
+            <p>{locale === 'ru' ? 'Для деловых встреч и многочисленных остановок' : 'For business meetings and multiple stops'}</p>
+          </div>
+        </div>
+
+        <div className={styles.bookingSection}>
+          <h2 className={styles.sectionTitle}>
+            {locale === 'ru' ? 'Забронировать аренду' : 'Book rental'}
+          </h2>
+          <HourlyBookingForm />
         </div>
       </div>
     </div>
