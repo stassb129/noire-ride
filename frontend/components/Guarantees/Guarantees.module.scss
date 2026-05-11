@@ -5,6 +5,7 @@
   padding: $section-padding 0;
   background: $bg-secondary;
   position: relative;
+  overflow-x: clip;
 
   @include mobile {
     padding: 80px 0;
@@ -19,11 +20,11 @@
 
 .content {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: $spacing-4xl;
   align-items: center;
 
-  @include desktop {
+  @include mobile {
     grid-template-columns: 1fr;
     gap: $spacing-3xl;
   }
@@ -32,7 +33,7 @@
 .textBlock {
   max-width: 560px;
 
-  @include desktop {
+  @include mobile {
     max-width: 100%;
   }
 }
@@ -95,8 +96,9 @@
 }
 
 .imageBlock {
-  @include desktop {
+  @include mobile {
     order: -1;
+    width: 100%;
   }
 }
 
@@ -104,8 +106,10 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: $spacing-lg;
+  width: 100%;
 
   @include mobile {
+    grid-template-columns: 1fr;
     gap: $spacing-md;
   }
 }
