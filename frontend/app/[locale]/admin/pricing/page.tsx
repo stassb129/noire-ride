@@ -5,7 +5,7 @@ import { fetchWithAuth } from '@/lib/utils/fetchWithAuth';
 import styles from '../bookings/bookings.module.scss';
 
 interface HourlyPricing {
-  id: number;
+  id: string;
   vehicleName: string;
   vehicleClass: string;
   pricePerHour: number;
@@ -13,10 +13,11 @@ interface HourlyPricing {
 }
 
 interface AirportPricing {
-  id: number;
+  id: string;
   vehicleName: string;
   vehicleClass: string;
   airportCode: string;
+  airportName?: string;
   direction: string;
   price: number;
 }
@@ -26,8 +27,10 @@ export default function AdminPricingPage() {
   const [hourlyPricing, setHourlyPricing] = useState<HourlyPricing[]>([]);
   const [airportPricing, setAirportPricing] = useState<AirportPricing[]>([]);
   const [loading, setLoading] = useState(true);
-  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [editData, setEditData] = useState<any>({});
+  const [creating, setCreating] = useState(false);
+  const [createData, setCreateData] = useState<any>({});
 
   useEffect(() => {
     fetchPricing();
@@ -49,7 +52,7 @@ export default function AdminPricingPage() {
     }
   };
 
-  const handleSaveHourly = async (id: number) => {
+  const handleSaveHourly = async (id: string) => {
     try {
       const response = await fetchWithAuth(
         `${process.env.NEXT_PUBLIC_API_URL}/admin/pricing/hourly/${id}`,
@@ -67,7 +70,7 @@ export default function AdminPricingPage() {
     }
   };
 
-  const handleSaveAirport = async (id: number) => {
+  const handleSaveAirport = async (id: string) => {
     try {
       const response = await fetchWithAuth(
         `${process.env.NEXT_PUBLIC_API_URL}/admin/pricing/airport/${id}`,
@@ -82,6 +85,98 @@ export default function AdminPricingPage() {
       setEditingId(null);
     } catch (error) {
       console.error('Error updating airport pricing:', error);
+    }
+  };
+
+  const handleDeleteHourly = async (id: string) => {
+    if (!confirm('Удалить эту запись цены?')) return;
+
+    try {
+      const response = await fetchWithAuth(
+        `${process.env.NEXT_PUBLIC_API_URL}/admin/pricing/hourly/${id}`,
+        { method: 'DELETE' }
+      );
+      if (!response.ok) throw new Error('Failed to delete');
+      await fetchPricing();
+    } catch (error) {
+      console.error('Error deleting hourly pricing:', error);
+    }
+  };
+
+  const handleDeleteAirport = async (id: string) => {
+    if (!confirm('Удалить эту запись цены?')) return;
+
+    try {
+      const response = await fetchWithAuth(
+        `${process.env.NEXT_PUBLIC_API_URL}/admin/pricing/airport/${id}`,
+        { method: 'DELETE' }
+      );
+      if (!response.ok) throw new Error('Failed to delete');
+      await fetchPricing();
+    } catch (error) {
+      console.error('Error deleting airport pricing:', error);
+    }
+  };
+
+  const getAirportName = (code: string) => {
+    if (code === 'SVO') return 'Sheremetyevo';
+    if (code === 'DME') return 'Domodedovo';
+    if (code === 'VKO') return 'Vnukovo';
+    return code;
+  };
+
+  const handleCreateHourly = async () => {
+    try {
+      const payload = {
+        vehicleName: createData.vehicleName || 'New vehicle',
+        vehicleClass: createData.vehicleClass || 'business',
+        pricePerHour: Number(createData.pricePerHour || 0),
+        minimumHours: Number(createData.minimumHours || 3),
+      };
+
+      const response = await fetchWithAuth(
+        `${process.env.NEXT_PUBLIC_API_URL}/admin/pricing/hourly`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        }
+      );
+      if (!response.ok) throw new Error('Failed to create');
+      await fetchPricing();
+      setCreating(false);
+      setCreateData({});
+    } catch (error) {
+      console.error('Error creating hourly pricing:', error);
+    }
+  };
+
+  const handleCreateAirport = async () => {
+    try {
+      const airportCode = createData.airportCode || 'SVO';
+      const payload = {
+        vehicleName: createData.vehicleName || 'New vehicle',
+        vehicleClass: createData.vehicleClass || 'business',
+        airportCode,
+        airportName: getAirportName(airportCode),
+        direction: createData.direction || 'to_airport',
+        price: Number(createData.price || 0),
+      };
+
+      const response = await fetchWithAuth(
+        `${process.env.NEXT_PUBLIC_API_URL}/admin/pricing/airport`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        }
+      );
+      if (!response.ok) throw new Error('Failed to create');
+      await fetchPricing();
+      setCreating(false);
+      setCreateData({});
+    } catch (error) {
+      console.error('Error creating airport pricing:', error);
     }
   };
 
@@ -112,6 +207,16 @@ export default function AdminPricingPage() {
             ✈️ Аэропорт
           </button>
         </div>
+
+        <button
+          className={creating ? styles.cancelBtn : styles.editBtn}
+          onClick={() => {
+            setCreating(!creating);
+            setCreateData({});
+          }}
+        >
+          {creating ? 'Отмена' : '+ Добавить запись цены'}
+        </button>
       </div>
 
       {activeTab === 'hourly' && (
@@ -126,6 +231,41 @@ export default function AdminPricingPage() {
               </tr>
             </thead>
             <tbody>
+              {creating && (
+                <tr>
+                  <td>
+                    <input
+                      type="text"
+                      value={createData.vehicleName || ''}
+                      onChange={(e) => setCreateData({ ...createData, vehicleName: e.target.value })}
+                      style={{ width: '100%', padding: '6px', background: '#0A0A0A', border: '1px solid #2A2A2A', borderRadius: '4px', color: '#eaeaea' }}
+                      placeholder="Название авто"
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="number"
+                      value={createData.pricePerHour || 0}
+                      onChange={(e) => setCreateData({ ...createData, pricePerHour: Number(e.target.value) })}
+                      style={{ width: '120px', padding: '6px', background: '#0A0A0A', border: '1px solid #2A2A2A', borderRadius: '4px', color: '#eaeaea' }}
+                    /> ₽
+                  </td>
+                  <td>
+                    <input
+                      type="number"
+                      value={createData.minimumHours || 3}
+                      onChange={(e) => setCreateData({ ...createData, minimumHours: Number(e.target.value) })}
+                      style={{ width: '80px', padding: '6px', background: '#0A0A0A', border: '1px solid #2A2A2A', borderRadius: '4px', color: '#eaeaea' }}
+                    /> ч
+                  </td>
+                  <td>
+                    <div className={styles.actions}>
+                      <button className={styles.saveBtn} onClick={handleCreateHourly}>Создать</button>
+                      <button className={styles.cancelBtn} onClick={() => setCreating(false)}>✕</button>
+                    </div>
+                  </td>
+                </tr>
+              )}
               {hourlyPricing.map((item) => (
                 <tr key={item.id}>
                   {editingId === item.id ? (
@@ -176,6 +316,12 @@ export default function AdminPricingPage() {
                         >
                           Изменить
                         </button>
+                        <button
+                          className={styles.deleteBtn}
+                          onClick={() => handleDeleteHourly(item.id)}
+                        >
+                          Удалить
+                        </button>
                       </td>
                     </>
                   )}
@@ -199,6 +345,54 @@ export default function AdminPricingPage() {
               </tr>
             </thead>
             <tbody>
+              {creating && (
+                <tr>
+                  <td>
+                    <input
+                      type="text"
+                      value={createData.vehicleName || ''}
+                      onChange={(e) => setCreateData({ ...createData, vehicleName: e.target.value })}
+                      style={{ width: '100%', padding: '6px', background: '#0A0A0A', border: '1px solid #2A2A2A', borderRadius: '4px', color: '#eaeaea' }}
+                      placeholder="Название авто"
+                    />
+                  </td>
+                  <td>
+                    <select
+                      value={createData.airportCode || 'SVO'}
+                      onChange={(e) => setCreateData({ ...createData, airportCode: e.target.value })}
+                      style={{ padding: '6px', background: '#0A0A0A', border: '1px solid #2A2A2A', borderRadius: '4px', color: '#eaeaea' }}
+                    >
+                      <option value="SVO">SVO</option>
+                      <option value="DME">DME</option>
+                      <option value="VKO">VKO</option>
+                    </select>
+                  </td>
+                  <td>
+                    <select
+                      value={createData.direction || 'to_airport'}
+                      onChange={(e) => setCreateData({ ...createData, direction: e.target.value })}
+                      style={{ padding: '6px', background: '#0A0A0A', border: '1px solid #2A2A2A', borderRadius: '4px', color: '#eaeaea' }}
+                    >
+                      <option value="to_airport">В аэропорт</option>
+                      <option value="from_airport">Из аэропорта</option>
+                    </select>
+                  </td>
+                  <td>
+                    <input
+                      type="number"
+                      value={createData.price || 0}
+                      onChange={(e) => setCreateData({ ...createData, price: Number(e.target.value) })}
+                      style={{ width: '120px', padding: '6px', background: '#0A0A0A', border: '1px solid #2A2A2A', borderRadius: '4px', color: '#eaeaea' }}
+                    /> ₽
+                  </td>
+                  <td>
+                    <div className={styles.actions}>
+                      <button className={styles.saveBtn} onClick={handleCreateAirport}>Создать</button>
+                      <button className={styles.cancelBtn} onClick={() => setCreating(false)}>✕</button>
+                    </div>
+                  </td>
+                </tr>
+              )}
               {airportPricing.map((item) => (
                 <tr key={item.id}>
                   {editingId === item.id ? (
@@ -262,6 +456,12 @@ export default function AdminPricingPage() {
                           }}
                         >
                           Изменить
+                        </button>
+                        <button
+                          className={styles.deleteBtn}
+                          onClick={() => handleDeleteAirport(item.id)}
+                        >
+                          Удалить
                         </button>
                       </td>
                     </>

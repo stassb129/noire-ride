@@ -60,6 +60,8 @@ export default function AllBookingsPage() {
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editStatus, setEditStatus] = useState('');
+  const [creating, setCreating] = useState(false);
+  const [createData, setCreateData] = useState<any>({});
 
   useEffect(() => {
     fetchBookings();
@@ -132,6 +134,86 @@ export default function AllBookingsPage() {
       fetchBookings();
     } catch (error) {
       console.error('Error deleting booking:', error);
+    }
+  };
+
+  const createBooking = async () => {
+    try {
+      const endpoints: Record<BookingType, string> = {
+        contacts: '/contacts',
+        routes: '/bookings/route',
+        airport: '/bookings/airport',
+        hourly: '/bookings/hourly',
+      };
+
+      const defaultByType: Record<BookingType, any> = {
+        contacts: {
+          name: '',
+          phone: '',
+          source: 'admin',
+          notes: '',
+        },
+        routes: {
+          name: '',
+          phone: '',
+          email: '',
+          from: 'Москва',
+          to: 'Санкт-Петербург',
+          date: '',
+          time: '',
+          vehicleClass: 'business',
+          passengers: 1,
+          notes: '',
+        },
+        airport: {
+          name: '',
+          phone: '',
+          email: '',
+          serviceType: 'pickup',
+          airport: 'SVO',
+          address: '',
+          date: '',
+          time: '',
+          flightNumber: '',
+          vehicleClass: 'business',
+          passengers: 1,
+          luggage: 1,
+          notes: '',
+        },
+        hourly: {
+          name: '',
+          phone: '',
+          email: '',
+          pickupAddress: '',
+          date: '',
+          time: '',
+          hours: 3,
+          vehicleClass: 'business',
+          passengers: 1,
+          notes: '',
+        },
+      };
+
+      const payload = { ...defaultByType[bookingType], ...createData };
+      if (bookingType === 'contacts') {
+        payload.source = payload.source || 'admin';
+      }
+
+      const response = await fetchWithAuth(
+        `${process.env.NEXT_PUBLIC_API_URL}${endpoints[bookingType]}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      if (!response.ok) throw new Error('Failed to create');
+      await fetchBookings();
+      setCreating(false);
+      setCreateData({});
+    } catch (error) {
+      console.error('Error creating booking:', error);
     }
   };
 
@@ -228,12 +310,121 @@ export default function AllBookingsPage() {
             </button>
           )}
         </div>
+
+        <button
+          className={creating ? styles.cancelBtn : styles.editBtn}
+          onClick={() => {
+            setCreating(!creating);
+            setCreateData({});
+          }}
+        >
+          {creating ? 'Отмена' : '+ Добавить запись'}
+        </button>
       </div>
 
       {loading ? (
         <p className={styles.loading}>Загрузка...</p>
       ) : (
         <div className={styles.tableContainer}>
+          {creating && (
+            <div style={{ padding: '16px', borderBottom: '1px solid #2A2A2A' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', gap: '8px', marginBottom: '8px' }}>
+                <input
+                  placeholder="Имя"
+                  value={createData.name || ''}
+                  onChange={(e) => setCreateData({ ...createData, name: e.target.value })}
+                  className={styles.statusSelect}
+                />
+                <input
+                  placeholder="Телефон"
+                  value={createData.phone || ''}
+                  onChange={(e) => setCreateData({ ...createData, phone: e.target.value })}
+                  className={styles.statusSelect}
+                />
+                {bookingType !== 'contacts' ? (
+                  <input
+                    placeholder="Email"
+                    value={createData.email || ''}
+                    onChange={(e) => setCreateData({ ...createData, email: e.target.value })}
+                    className={styles.statusSelect}
+                  />
+                ) : (
+                  <input
+                    placeholder="Источник"
+                    value={createData.source || 'admin'}
+                    onChange={(e) => setCreateData({ ...createData, source: e.target.value })}
+                    className={styles.statusSelect}
+                  />
+                )}
+                {bookingType === 'contacts' && (
+                  <input
+                    placeholder="Комментарий"
+                    value={createData.notes || ''}
+                    onChange={(e) => setCreateData({ ...createData, notes: e.target.value })}
+                    className={styles.statusSelect}
+                  />
+                )}
+              </div>
+
+              {bookingType === 'routes' && (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0, 1fr))', gap: '8px', marginBottom: '8px' }}>
+                  <input placeholder="Откуда" value={createData.from || ''} onChange={(e) => setCreateData({ ...createData, from: e.target.value })} className={styles.statusSelect} />
+                  <input placeholder="Куда" value={createData.to || ''} onChange={(e) => setCreateData({ ...createData, to: e.target.value })} className={styles.statusSelect} />
+                  <input type="date" value={createData.date || ''} onChange={(e) => setCreateData({ ...createData, date: e.target.value })} className={styles.statusSelect} />
+                  <input type="time" value={createData.time || ''} onChange={(e) => setCreateData({ ...createData, time: e.target.value })} className={styles.statusSelect} />
+                  <input type="number" min={1} placeholder="Пассажиры" value={createData.passengers || 1} onChange={(e) => setCreateData({ ...createData, passengers: Number(e.target.value) })} className={styles.statusSelect} />
+                </div>
+              )}
+
+              {bookingType === 'airport' && (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, minmax(0, 1fr))', gap: '8px', marginBottom: '8px' }}>
+                  <select value={createData.serviceType || 'pickup'} onChange={(e) => setCreateData({ ...createData, serviceType: e.target.value })} className={styles.statusSelect}>
+                    <option value="pickup">Встреча</option>
+                    <option value="dropoff">Проводы</option>
+                  </select>
+                  <select value={createData.airport || 'SVO'} onChange={(e) => setCreateData({ ...createData, airport: e.target.value })} className={styles.statusSelect}>
+                    <option value="SVO">SVO</option>
+                    <option value="DME">DME</option>
+                    <option value="VKO">VKO</option>
+                  </select>
+                  <input placeholder="Адрес" value={createData.address || ''} onChange={(e) => setCreateData({ ...createData, address: e.target.value })} className={styles.statusSelect} />
+                  <input type="date" value={createData.date || ''} onChange={(e) => setCreateData({ ...createData, date: e.target.value })} className={styles.statusSelect} />
+                  <input type="time" value={createData.time || ''} onChange={(e) => setCreateData({ ...createData, time: e.target.value })} className={styles.statusSelect} />
+                  <input placeholder="Рейс" value={createData.flightNumber || ''} onChange={(e) => setCreateData({ ...createData, flightNumber: e.target.value })} className={styles.statusSelect} />
+                </div>
+              )}
+
+              {bookingType === 'hourly' && (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0, 1fr))', gap: '8px', marginBottom: '8px' }}>
+                  <input placeholder="Адрес подачи" value={createData.pickupAddress || ''} onChange={(e) => setCreateData({ ...createData, pickupAddress: e.target.value })} className={styles.statusSelect} />
+                  <input type="date" value={createData.date || ''} onChange={(e) => setCreateData({ ...createData, date: e.target.value })} className={styles.statusSelect} />
+                  <input type="time" value={createData.time || ''} onChange={(e) => setCreateData({ ...createData, time: e.target.value })} className={styles.statusSelect} />
+                  <input type="number" min={1} placeholder="Часы" value={createData.hours || 3} onChange={(e) => setCreateData({ ...createData, hours: Number(e.target.value) })} className={styles.statusSelect} />
+                  <input type="number" min={1} placeholder="Пассажиры" value={createData.passengers || 1} onChange={(e) => setCreateData({ ...createData, passengers: Number(e.target.value) })} className={styles.statusSelect} />
+                </div>
+              )}
+
+              {bookingType !== 'contacts' && (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '8px' }}>
+                  <select value={createData.vehicleClass || 'business'} onChange={(e) => setCreateData({ ...createData, vehicleClass: e.target.value })} className={styles.statusSelect}>
+                    <option value="business">Business</option>
+                    <option value="premium">Premium</option>
+                    <option value="minivan">Minivan</option>
+                    <option value="luxury">Luxury</option>
+                  </select>
+                  {bookingType === 'airport' && (
+                    <input type="number" min={0} placeholder="Багаж" value={createData.luggage || 1} onChange={(e) => setCreateData({ ...createData, luggage: Number(e.target.value) })} className={styles.statusSelect} />
+                  )}
+                  <input placeholder="Заметки" value={createData.notes || ''} onChange={(e) => setCreateData({ ...createData, notes: e.target.value })} className={styles.statusSelect} />
+                </div>
+              )}
+
+              <div style={{ marginTop: '12px', display: 'flex', gap: '8px' }}>
+                <button className={styles.saveBtn} onClick={createBooking}>Создать</button>
+                <button className={styles.cancelBtn} onClick={() => setCreating(false)}>Отмена</button>
+              </div>
+            </div>
+          )}
           <table className={styles.table}>
             <thead>
               <tr>

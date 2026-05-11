@@ -65,9 +65,24 @@ export class AdminController {
   }
 
   // Pricing Management
+  @Post('pricing/hourly')
+  async createHourlyPrice(@Body() data: any) {
+    return this.adminService.createHourlyPrice(data);
+  }
+
   @Patch('pricing/hourly/:id')
   async updateHourlyPrice(@Param('id') id: string, @Body() data: any) {
     return this.adminService.updateHourlyPrice(id, data);
+  }
+
+  @Delete('pricing/hourly/:id')
+  async deleteHourlyPrice(@Param('id') id: string) {
+    return this.adminService.deleteHourlyPrice(id);
+  }
+
+  @Post('pricing/airport')
+  async createAirportPrice(@Body() data: any) {
+    return this.adminService.createAirportPrice(data);
   }
 
   @Patch('pricing/airport/:id')
@@ -75,8 +90,23 @@ export class AdminController {
     return this.adminService.updateAirportPrice(id, data);
   }
 
+  @Delete('pricing/airport/:id')
+  async deleteAirportPrice(@Param('id') id: string) {
+    return this.adminService.deleteAirportPrice(id);
+  }
+
+  @Post('pricing/intercity')
+  async createIntercityPrice(@Body() data: any) {
+    return this.adminService.createIntercityPrice(data);
+  }
+
   @Patch('pricing/intercity/:id')
   async updateIntercityPrice(@Param('id') id: string, @Body() data: any) {
     return this.adminService.updateIntercityPrice(id, data);
+  }
+
+  @Delete('pricing/intercity/:id')
+  async deleteIntercityPrice(@Param('id') id: string) {
+    return this.adminService.deleteIntercityPrice(id);
   }
 }

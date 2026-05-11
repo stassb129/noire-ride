@@ -76,9 +76,24 @@ export class AdminService {
   }
 
   // Pricing Management
+  async createHourlyPrice(data: Partial<HourlyPricing>) {
+    const pricing = this.hourlyRepo.create(data);
+    return this.hourlyRepo.save(pricing);
+  }
+
   async updateHourlyPrice(id: string, data: Partial<HourlyPricing>) {
     await this.hourlyRepo.update(id, data);
     return this.hourlyRepo.findOne({ where: { id } });
+  }
+
+  async deleteHourlyPrice(id: string) {
+    await this.hourlyRepo.delete(id);
+    return { message: 'Hourly pricing deleted successfully' };
+  }
+
+  async createAirportPrice(data: Partial<AirportPricing>) {
+    const pricing = this.airportRepo.create(data);
+    return this.airportRepo.save(pricing);
   }
 
   async updateAirportPrice(id: string, data: Partial<AirportPricing>) {
@@ -86,9 +101,24 @@ export class AdminService {
     return this.airportRepo.findOne({ where: { id } });
   }
 
+  async deleteAirportPrice(id: string) {
+    await this.airportRepo.delete(id);
+    return { message: 'Airport pricing deleted successfully' };
+  }
+
+  async createIntercityPrice(data: Partial<IntercityPricing>) {
+    const pricing = this.intercityRepo.create(data);
+    return this.intercityRepo.save(pricing);
+  }
+
   async updateIntercityPrice(id: string, data: Partial<IntercityPricing>) {
     await this.intercityRepo.update(id, data);
     return this.intercityRepo.findOne({ where: { id } });
+  }
+
+  async deleteIntercityPrice(id: string) {
+    await this.intercityRepo.delete(id);
+    return { message: 'Intercity pricing deleted successfully' };
   }
 
   // Statistics
