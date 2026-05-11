@@ -1,17 +1,20 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, type Variants } from 'framer-motion';
 import { Shield, Award, Headphones, CreditCard, MapPin, Clock } from 'lucide-react';
 import { useLocale } from 'next-intl';
 import styles from './Benefits.module.scss';
 
-const cardVariants = {
+/** Cubic-bezier tuple — `as const` so TS matches Framer Motion `Easing`, not `number[]`. */
+const easeOutExpo = [0.22, 1, 0.36, 1] as const;
+
+const cardVariants: Variants = {
   initial: { opacity: 0, y: 40 },
   animate: { opacity: 1, y: 0 },
-  hover: { 
+  hover: {
     y: -6,
-    transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] }
-  }
+    transition: { duration: 0.3, ease: easeOutExpo },
+  },
 };
 
 const staggerContainer = {
@@ -79,7 +82,7 @@ export default function Benefits() {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          transition={{ duration: 0.6, ease: easeOutExpo }}
         >
           <h2 className={styles.title}>
             {locale === 'ru' ? 'Почему выбирают нас' : 'Why choose us'}
