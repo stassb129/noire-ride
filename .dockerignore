@@ -1,0 +1,16 @@
+**/node_modules
+**/.next
+**/dist
+.git
+.gitignore
+*.md
+.env
+.env.*
+!.env.example
+**/coverage
+**/.turbo
+frontend/.next
+backend/dist
+.cursor
+terminals
+mcps

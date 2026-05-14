@@ -1,45 +1,128 @@
+name: noir-ride
+
 services:
-  postgres:
+  db:
     image: postgres:16-alpine
     container_name: noir-ride-db
     restart: unless-stopped
     environment:
-      POSTGRES_DB: noir_ride
-      POSTGRES_USER: noir_admin
-      POSTGRES_PASSWORD: noir_password_2026
-      PGDATA: /var/lib/postgresql/data/pgdata
-    ports:
-      - "5432:5432"
+      POSTGRES_USER: ${DB_USERNAME:-noir_admin}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-noir_password_change_me}
+      POSTGRES_DB: ${DB_DATABASE:-noir_ride}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - app-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U noir_admin -d noir_ride"]
-      interval: 10s
+      test: ['CMD-SHELL', 'pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"']
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 15s
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: noir-ride-backend
+    restart: unless-stopped
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      NODE_ENV: production
+      PORT: '3000'
+      DB_HOST: db
+      DB_PORT: '5432'
+      DB_USERNAME: ${DB_USERNAME:-noir_admin}
+      DB_PASSWORD: ${DB_PASSWORD:-noir_password_change_me}
+      DB_DATABASE: ${DB_DATABASE:-noir_ride}
+      JWT_SECRET: ${JWT_SECRET:-change-me-use-32-plus-chars-in-production}
+      FRONTEND_URL: ${FRONTEND_URL:-https://noir-ride.ru}
+      DB_SYNC: ${DB_SYNC:-true}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app-network
+    healthcheck:
+      test: ['CMD', 'curl', '-fsS', 'http://127.0.0.1:3000/']
+      interval: 30s
       timeout: 5s
       retries: 5
+      start_period: 55s
 
-  # Optional: pgAdmin for database management
-  pgadmin:
-    image: dpage/pgadmin4:latest
-    container_name: noir-ride-pgadmin
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://noir-ride.ru/api}
+    container_name: noir-ride-frontend
     restart: unless-stopped
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@noirride.com
-      PGADMIN_DEFAULT_PASSWORD: admin123
-      PGADMIN_LISTEN_PORT: 80
-    ports:
-      - "5050:80"
-    volumes:
-      - pgadmin_data:/var/lib/pgadmin
+      NODE_ENV: production
+      PORT: '3000'
+      HOSTNAME: '0.0.0.0'
     depends_on:
-      - postgres
+      backend:
+        condition: service_healthy
+    networks:
+      - app-network
+    healthcheck:
+      test: ['CMD', 'curl', '-fsS', 'http://127.0.0.1:3000/']
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 90s
 
-volumes:
-  postgres_data:
-    driver: local
-  pgadmin_data:
-    driver: local
+  nginx:
+    image: nginx:alpine
+    container_name: noir-ride-nginx
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - certbot-www:/var/www/certbot:ro
+    depends_on:
+      backend:
+        condition: service_healthy
+      frontend:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: noir-ride-migrate
+    profiles: ['migrate']
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      NODE_ENV: production
+      DB_HOST: db
+      DB_PORT: '5432'
+      DB_USERNAME: ${DB_USERNAME:-noir_admin}
+      DB_PASSWORD: ${DB_PASSWORD:-noir_password_change_me}
+      DB_DATABASE: ${DB_DATABASE:-noir_ride}
+    command: ['npm', '--prefix', 'backend', 'run', 'migration:run']
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - app-network
+    restart: 'no'
 
 networks:
-  default:
-    name: noir-ride-network
+  app-network:
+    driver: bridge
+
+volumes:
+  pgdata:
+  certbot-www:

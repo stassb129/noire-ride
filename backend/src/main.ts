@@ -10,8 +10,8 @@ async function bootstrap() {
     credentials: true,
   });
 
-  const port = process.env.PORT || 3001;
-  await app.listen(port);
+  const port = parseInt(process.env.PORT || '3001', 10);
+  await app.listen(port, '0.0.0.0');
   
   console.log(`\n🚀 Application is running on: http://localhost:${port}`);
   console.log(`📊 Database: ${process.env.DB_DATABASE}@${process.env.DB_HOST}:${process.env.DB_PORT}`);

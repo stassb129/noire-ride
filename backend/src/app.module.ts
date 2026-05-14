@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { getPostgresConnectionOptions } from './database/database.config';
 
 // Entities
 import { Booking } from './entities/booking.entity';
@@ -32,11 +33,7 @@ import { ContactsModule } from './contacts/contacts.module';
     // TypeORM configuration
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: process.env.DB_HOST || 'localhost',
-      port: parseInt(process.env.DB_PORT || '5432', 10),
-      username: process.env.DB_USERNAME || 'noir_admin',
-      password: process.env.DB_PASSWORD || 'noir_password_2026',
-      database: process.env.DB_DATABASE || 'noir_ride',
+      ...getPostgresConnectionOptions(),
       entities: [
         Booking,
         Route,

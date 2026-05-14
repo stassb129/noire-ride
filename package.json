@@ -18,10 +18,14 @@
     "start:frontend": "cd frontend && npm start",
     "start:backend": "cd backend && npm run start:prod",
     "install:all": "cd frontend && npm install && cd ../backend && npm install",
-    "docker:up": "docker-compose up -d",
-    "docker:down": "docker-compose down",
-    "docker:logs": "docker-compose logs -f",
-    "docker:reset": "docker-compose down -v && docker-compose up -d",
+    "docker:up": "docker compose -f docker-compose.dev.yml up -d",
+    "docker:down": "docker compose -f docker-compose.dev.yml down",
+    "docker:logs": "docker compose -f docker-compose.dev.yml logs -f",
+    "docker:reset": "docker compose -f docker-compose.dev.yml down -v && docker compose -f docker-compose.dev.yml up -d",
+    "docker:prod": "docker compose up -d --build",
+    "docker:prod:build": "docker compose build",
+    "docker:prod:logs": "docker compose logs -f",
+    "docker:migrate": "docker compose --profile migrate run --rm migrate",
     "db:setup": "npm run docker:up && timeout /t 10 && echo Database is ready!"
   },
   "devDependencies": {
